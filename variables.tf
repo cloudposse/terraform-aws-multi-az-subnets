@@ -55,12 +55,12 @@ variable "cidr_block" {
 }
 
 variable "igw_id" {
-  description = "Internet Gateway ID which will be used as a default route in public route tables (e.g. `igw-9c26a123`). Conflicts with `ngw_id`"
+  description = "Internet Gateway ID which will be used as a default route in public route tables (e.g. `igw-9c26a123`)"
   default     = ""
 }
 
 variable "ngw_id" {
-  description = "NAT Gateway ID which will be used as a default route in private route tables (e.g. `igw-9c26a123`). Conflicts with `igw_id`"
+  description = "NAT Gateway ID which will be used as a default route in private route tables (e.g. `igw-9c26a123`)"
   default     = ""
 }
 
