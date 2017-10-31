@@ -2,7 +2,7 @@
 
 Terraform module for multi-AZ [`subnets`](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Subnets.html) provisioning.
 
-The module creates one private or public subnet (specified by `var.type`) in each Availability Zone specified in `var.availability_zones`.
+The module creates a private or public subnet (specified by `var.type`) in each Availability Zone from `var.availability_zones`.
 The public subnets are routed to the Internet Gateway (using the provided Internet Gateway ID).
 The private subnets are routed to the NAT Gateway (using the provided NAT Gateway ID).
 
@@ -76,17 +76,17 @@ module "private_subnets" {
 
 ## Outputs
 
-| Name                      | Description                                  |
-|:--------------------------|:---------------------------------------------|
-| ngw_id                    | NAT Gateway ID                               |
-| ngw_private_ip            | Private IP address of the NAT Gateway        |
-| ngw_public_ip             | Public IP address of the NAT Gateway         |
-| route_table_ids           | Route Table IDs                              |
-| subnet_ids                | Subnet IDs                                   |
-| az_subnet_ids             | Map of AZ names to subnet IDs                |
+| Name                      | Description                                                          |
+|:--------------------------|:---------------------------------------------------------------------|
+| ngw_id                    | NAT Gateway ID (only if var.type = "public")                         |
+| ngw_private_ip            | Private IP address of the NAT Gateway (only if var.type = "public")  |
+| ngw_public_ip             | Public IP address of the NAT Gateway (only if var.type = "public")   |
+| route_table_ids           | Route Table IDs                                                      |
+| subnet_ids                | Subnet IDs                                                           |
+| az_subnet_ids             | Map of AZ names to subnet IDs                                        |
 
 
-Given the following configuration (see the Simple example above)
+Given the following configuration
 
 ```hcl
 locals {
