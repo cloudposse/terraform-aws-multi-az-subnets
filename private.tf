@@ -1,5 +1,6 @@
 locals {
-  private_count = "${var.enabled == "true" && var.type == "private" ? length(var.availability_zones) : 0}"
+  private_count              = "${var.enabled == "true" && var.type == "private" ? length(var.availability_zones) : 0}"
+  private_nat_gateways_count = "${var.enabled == "true" && var.type == "private" ? length(var.ngw_ids) : 0}"
 }
 
 module "private_label" {
@@ -19,37 +20,49 @@ resource "aws_subnet" "private" {
   availability_zone = "${element(var.availability_zones, count.index)}"
   cidr_block        = "${cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), count.index)}"
 
-  tags = {
-    "Name"      = "${module.private_label.id}${var.delimiter}${element(var.availability_zones, count.index)}"
-    "Stage"     = "${module.private_label.stage}"
-    "Namespace" = "${module.private_label.namespace}"
-    "AZ"        = "${element(var.availability_zones, count.index)}"
-    "Type"      = "${var.type}"
-  }
+  tags = "${
+    merge(
+      map(
+        "Name", "${module.private_label.id}${var.delimiter}${element(var.availability_zones, count.index)}",
+        "Namespace", "${module.private_label.namespace}",
+        "Stage", "${module.private_label.stage}",
+        "AZ", "${element(var.availability_zones, count.index)}",
+        "Type", "${var.type}"
+      ), module.private_label.tags
+    )
+  }"
 }
 
 resource "aws_route_table" "private" {
-  count  = "${local.private_count}"
+  count  = "${local.private_nat_gateways_count}"
   vpc_id = "${data.aws_vpc.default.id}"
 
-  tags = {
-    "Name"      = "${module.private_label.id}${var.delimiter}${element(var.availability_zones, count.index)}"
-    "Stage"     = "${module.private_label.stage}"
-    "Namespace" = "${module.private_label.namespace}"
-  }
-}
-
-resource "aws_route" "private" {
-  count                  = "${local.private_count}"
-  route_table_id         = "${element(aws_route_table.private.*.id, count.index)}"
-  nat_gateway_id         = "${var.ngw_id}"
-  destination_cidr_block = "0.0.0.0/0"
+  tags = "${
+    merge(
+      map(
+        "Name", "${module.private_label.id}${var.delimiter}${element(var.availability_zones, count.index)}",
+        "Namespace", "${module.private_label.namespace}",
+        "Stage", "${module.private_label.stage}",
+        "AZ", "${element(var.availability_zones, count.index)}",
+        "Type", "${var.type}"
+      ), module.private_label.tags
+    )
+  }"
 }
 
 resource "aws_route_table_association" "private" {
-  count          = "${local.private_count}"
+  count          = "${local.private_nat_gateways_count}"
   subnet_id      = "${element(aws_subnet.private.*.id, count.index)}"
   route_table_id = "${element(aws_route_table.private.*.id, count.index)}"
+  depends_on     = ["aws_route_table.private"]
+}
+
+resource "aws_route" "default" {
+  count                  = "${local.private_nat_gateways_count}"
+  route_table_id         = "${element(aws_route_table.private.*.id, count.index)}"
+  nat_gateway_id         = "${element(var.ngw_ids, count.index)}"
+  destination_cidr_block = "0.0.0.0/0"
+  depends_on             = ["aws_route_table.private"]
 }
 
 resource "aws_network_acl" "private" {

@@ -1,5 +1,6 @@
 locals {
-  public_count = "${var.enabled == "true" && var.type == "public" ? length(var.availability_zones) : 0}"
+  public_count              = "${var.enabled == "true" && var.type == "public" ? length(var.availability_zones) : 0}"
+  public_nat_gateways_count = "${var.enabled == "true" && var.type == "public" && var.nat_gateway_enabled == "true" ? length(var.availability_zones) : 0}"
 }
 
 module "public_label" {
@@ -10,6 +11,7 @@ module "public_label" {
   delimiter  = "${var.delimiter}"
   tags       = "${var.tags}"
   attributes = ["${compact(concat(var.attributes, list("public")))}"]
+  enabled    = "${var.enabled}"
 }
 
 resource "aws_subnet" "public" {
@@ -18,24 +20,34 @@ resource "aws_subnet" "public" {
   availability_zone = "${element(var.availability_zones, count.index)}"
   cidr_block        = "${cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), count.index)}"
 
-  tags = {
-    "Name"      = "${module.public_label.id}${var.delimiter}${element(var.availability_zones, count.index)}"
-    "Stage"     = "${module.public_label.stage}"
-    "Namespace" = "${module.public_label.namespace}"
-    "AZ"        = "${element(var.availability_zones, count.index)}"
-    "Type"      = "${var.type}"
-  }
+  tags = "${
+    merge(
+      map(
+        "Name", "${module.public_label.id}${var.delimiter}${element(var.availability_zones, count.index)}",
+        "Namespace", "${module.public_label.namespace}",
+        "Stage", "${module.public_label.stage}",
+        "AZ", "${element(var.availability_zones, count.index)}",
+        "Type", "${var.type}"
+      ), module.public_label.tags
+    )
+  }"
 }
 
 resource "aws_route_table" "public" {
   count  = "${local.public_count}"
   vpc_id = "${data.aws_vpc.default.id}"
 
-  tags = {
-    "Name"      = "${module.public_label.id}${var.delimiter}${element(var.availability_zones, count.index)}"
-    "Stage"     = "${module.public_label.stage}"
-    "Namespace" = "${module.public_label.namespace}"
-  }
+  tags = "${
+    merge(
+      map(
+        "Name", "${module.public_label.id}${var.delimiter}${element(var.availability_zones, count.index)}",
+        "Namespace", "${module.public_label.namespace}",
+        "Stage", "${module.public_label.stage}",
+        "AZ", "${element(var.availability_zones, count.index)}",
+        "Type", "${var.type}"
+      ), module.public_label.tags
+    )
+  }"
 }
 
 resource "aws_route" "public" {
@@ -43,12 +55,14 @@ resource "aws_route" "public" {
   route_table_id         = "${element(aws_route_table.public.*.id, count.index)}"
   gateway_id             = "${var.igw_id}"
   destination_cidr_block = "0.0.0.0/0"
+  depends_on             = ["aws_route_table.public"]
 }
 
 resource "aws_route_table_association" "public" {
   count          = "${local.public_count}"
   subnet_id      = "${element(aws_subnet.public.*.id, count.index)}"
   route_table_id = "${element(aws_route_table.public.*.id, count.index)}"
+  depends_on     = ["aws_route_table.public"]
 }
 
 resource "aws_network_acl" "public" {
@@ -60,8 +74,8 @@ resource "aws_network_acl" "public" {
   tags       = "${module.public_label.tags}"
 }
 
-resource "aws_eip" "default" {
-  count = "${var.enabled == "true" && var.type == "public" ? 1 : 0}"
+resource "aws_eip" "public" {
+  count = "${local.public_nat_gateways_count}"
   vpc   = true
 
   lifecycle {
@@ -69,13 +83,24 @@ resource "aws_eip" "default" {
   }
 }
 
-resource "aws_nat_gateway" "default" {
-  count         = "${var.enabled == "true" && var.type == "public" ? 1 : 0}"
-  allocation_id = "${join("", aws_eip.default.*.id)}"
-  subnet_id     = "${element(aws_subnet.public.*.id, 0)}"
-  tags          = "${module.public_label.tags}"
+resource "aws_nat_gateway" "public" {
+  count         = "${local.public_nat_gateways_count}"
+  allocation_id = "${element(aws_eip.public.*.id, count.index)}"
+  subnet_id     = "${element(aws_subnet.public.*.id, count.index)}"
 
   lifecycle {
     create_before_destroy = true
   }
+
+  tags = "${
+    merge(
+      map(
+        "Name", "${module.public_label.id}${var.delimiter}${element(var.availability_zones, count.index)}",
+        "Namespace", "${module.public_label.namespace}",
+        "Stage", "${module.public_label.stage}",
+        "AZ", "${element(var.availability_zones, count.index)}",
+        "Type", "${var.type}"
+      ), module.public_label.tags
+    )
+  }"
 }
