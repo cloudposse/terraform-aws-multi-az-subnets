@@ -1,3 +1,7 @@
+locals {
+  public_count = "${var.type == "public" ? length(var.availability_zones) : 0}"
+}
+
 module "public_label" {
   source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.3.0"
   namespace  = "${var.namespace}"
@@ -9,8 +13,8 @@ module "public_label" {
 }
 
 resource "aws_subnet" "public" {
-  count             = "${var.type == "public" ? length(var.availability_zones) : 0}"
-  vpc_id            = "${var.vpc_id}"
+  count             = "${local.public_count}"
+  vpc_id            = "${data.aws_vpc.default.id}"
   availability_zone = "${element(var.availability_zones, count.index)}"
   cidr_block        = "${cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), count.index)}"
 
@@ -24,8 +28,8 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_route_table" "public" {
-  count  = "${var.type == "public" ? length(var.availability_zones) : 0}"
-  vpc_id = "${var.vpc_id}"
+  count  = "${local.public_count}"
+  vpc_id = "${data.aws_vpc.default.id}"
 
   tags = {
     "Name"      = "${module.public_label.id}${var.delimiter}${element(var.availability_zones, count.index)}"
@@ -35,20 +39,20 @@ resource "aws_route_table" "public" {
 }
 
 resource "aws_route" "public" {
-  count                  = "${var.type == "public" ? length(var.availability_zones) : 0}"
+  count                  = "${local.public_count}"
   route_table_id         = "${element(aws_route_table.public.*.id, count.index)}"
   gateway_id             = "${var.igw_id}"
   destination_cidr_block = "0.0.0.0/0"
 }
 
 resource "aws_route_table_association" "public" {
-  count          = "${var.type == "public" ? length(var.availability_zones) : 0}"
+  count          = "${local.public_count}"
   subnet_id      = "${element(aws_subnet.public.*.id, count.index)}"
   route_table_id = "${element(aws_route_table.public.*.id, count.index)}"
 }
 
 resource "aws_network_acl" "public" {
-  count      = "${var.type == "public" && signum(length(var.private_network_acl_id)) == 0 ? 1 : 0}"
+  count      = "${var.type == "public" && signum(length(var.public_network_acl_id)) == 0 ? 1 : 0}"
   vpc_id     = "${data.aws_vpc.default.id}"
   subnet_ids = ["${aws_subnet.public.*.id}"]
   egress     = "${var.public_network_acl_egress}"
