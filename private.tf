@@ -1,5 +1,5 @@
 locals {
-  private_count = "${var.type == "private" ? length(var.availability_zones) : 0}"
+  private_count = "${var.enabled == "true" && var.type == "private" ? length(var.availability_zones) : 0}"
 }
 
 module "private_label" {
@@ -10,6 +10,7 @@ module "private_label" {
   delimiter  = "${var.delimiter}"
   tags       = "${var.tags}"
   attributes = ["${compact(concat(var.attributes, list("private")))}"]
+  enabled    = "${var.enabled}"
 }
 
 resource "aws_subnet" "private" {
@@ -52,7 +53,7 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_network_acl" "private" {
-  count      = "${var.type == "private" && signum(length(var.private_network_acl_id)) == 0 ? 1 : 0}"
+  count      = "${var.enabled == "true" && var.type == "private" && signum(length(var.private_network_acl_id)) == 0 ? 1 : 0}"
   vpc_id     = "${data.aws_vpc.default.id}"
   subnet_ids = ["${aws_subnet.private.*.id}"]
   egress     = "${var.private_network_acl_egress}"

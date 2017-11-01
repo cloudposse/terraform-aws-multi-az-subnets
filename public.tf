@@ -1,5 +1,5 @@
 locals {
-  public_count = "${var.type == "public" ? length(var.availability_zones) : 0}"
+  public_count = "${var.enabled == "true" && var.type == "public" ? length(var.availability_zones) : 0}"
 }
 
 module "public_label" {
@@ -52,7 +52,7 @@ resource "aws_route_table_association" "public" {
 }
 
 resource "aws_network_acl" "public" {
-  count      = "${var.type == "public" && signum(length(var.public_network_acl_id)) == 0 ? 1 : 0}"
+  count      = "${var.enabled == "true" && var.type == "public" && signum(length(var.public_network_acl_id)) == 0 ? 1 : 0}"
   vpc_id     = "${data.aws_vpc.default.id}"
   subnet_ids = ["${aws_subnet.public.*.id}"]
   egress     = "${var.public_network_acl_egress}"
@@ -61,7 +61,7 @@ resource "aws_network_acl" "public" {
 }
 
 resource "aws_eip" "default" {
-  count = "${var.type == "public" ? 1 : 0}"
+  count = "${var.enabled == "true" && var.type == "public" ? 1 : 0}"
   vpc   = true
 
   lifecycle {
@@ -70,7 +70,7 @@ resource "aws_eip" "default" {
 }
 
 resource "aws_nat_gateway" "default" {
-  count         = "${var.type == "public" ? 1 : 0}"
+  count         = "${var.enabled == "true" && var.type == "public" ? 1 : 0}"
   allocation_id = "${join("", aws_eip.default.*.id)}"
   subnet_id     = "${element(aws_subnet.public.*.id, 0)}"
   tags          = "${module.public_label.tags}"
