@@ -34,7 +34,7 @@ variable "tags" {
 variable "availability_zones" {
   type        = "list"
   default     = []
-  description = "Only for public subnets. List of Availability Zones to create public subnets (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`)"
+  description = "List of Availability Zones (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`)"
 }
 
 variable "max_subnets" {
@@ -60,13 +60,13 @@ variable "cidr_block" {
 
 variable "igw_id" {
   type        = "string"
-  description = "Only for public subnets. Internet Gateway ID which is used as a default route in public route tables when creating public subnets (e.g. `igw-9c26a123`)"
+  description = "Internet Gateway ID that is used as a default route when creating public subnets (e.g. `igw-9c26a123`)"
   default     = ""
 }
 
 variable "az_ngw_ids" {
   type        = "map"
-  description = "Only for private subnets. Map of AZ names to NAT Gateway IDs which are used as default routes in private route tables when creating private subnets"
+  description = "Only for private subnets. Map of AZ names to NAT Gateway IDs that are used as default routes when creating private subnets"
   default     = {}
 }
 
@@ -152,6 +152,6 @@ variable "enabled" {
 }
 
 variable "nat_gateway_enabled" {
-  description = "Flag to enable/disable NAT Gateways for public subnets, and to enable/disable routing to NAT Gateways for private subnets"
+  description = "Flag to enable/disable NAT Gateways creation in public subnets"
   default     = "true"
 }
