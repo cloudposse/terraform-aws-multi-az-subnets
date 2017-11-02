@@ -164,7 +164,7 @@ If you don't need to route the private subnets to NAT Gateways, set the flag to 
 
 For example:
 
-```
+```hcl
 module "private_subnets" {
   source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
   namespace           = "${var.namespace}"
