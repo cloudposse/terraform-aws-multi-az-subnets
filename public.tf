@@ -22,15 +22,24 @@ resource "aws_subnet" "public" {
 
   tags = "${
     merge(
+      module.public_label.tags,
       map(
         "Name", "${module.public_label.id}${var.delimiter}${element(var.availability_zones, count.index)}",
-        "Namespace", "${module.public_label.namespace}",
-        "Stage", "${module.public_label.stage}",
         "AZ", "${element(var.availability_zones, count.index)}",
         "Type", "${var.type}"
-      ), module.public_label.tags
+      )
     )
   }"
+}
+
+resource "aws_network_acl" "public" {
+  count      = "${var.enabled == "true" && var.type == "public" && signum(length(var.public_network_acl_id)) == 0 ? 1 : 0}"
+  vpc_id     = "${data.aws_vpc.default.id}"
+  subnet_ids = ["${aws_subnet.public.*.id}"]
+  egress     = "${var.public_network_acl_egress}"
+  ingress    = "${var.public_network_acl_ingress}"
+  tags       = "${module.public_label.tags}"
+  depends_on = ["aws_subnet.public"]
 }
 
 resource "aws_route_table" "public" {
@@ -39,13 +48,12 @@ resource "aws_route_table" "public" {
 
   tags = "${
     merge(
+      module.public_label.tags,
       map(
         "Name", "${module.public_label.id}${var.delimiter}${element(var.availability_zones, count.index)}",
-        "Namespace", "${module.public_label.namespace}",
-        "Stage", "${module.public_label.stage}",
         "AZ", "${element(var.availability_zones, count.index)}",
         "Type", "${var.type}"
-      ), module.public_label.tags
+      )
     )
   }"
 }
@@ -62,16 +70,7 @@ resource "aws_route_table_association" "public" {
   count          = "${local.public_count}"
   subnet_id      = "${element(aws_subnet.public.*.id, count.index)}"
   route_table_id = "${element(aws_route_table.public.*.id, count.index)}"
-  depends_on     = ["aws_route_table.public"]
-}
-
-resource "aws_network_acl" "public" {
-  count      = "${var.enabled == "true" && var.type == "public" && signum(length(var.public_network_acl_id)) == 0 ? 1 : 0}"
-  vpc_id     = "${data.aws_vpc.default.id}"
-  subnet_ids = ["${aws_subnet.public.*.id}"]
-  egress     = "${var.public_network_acl_egress}"
-  ingress    = "${var.public_network_acl_ingress}"
-  tags       = "${module.public_label.tags}"
+  depends_on     = ["aws_subnet.public", "aws_route_table.public"]
 }
 
 resource "aws_eip" "public" {
@@ -87,6 +86,7 @@ resource "aws_nat_gateway" "public" {
   count         = "${local.public_nat_gateways_count}"
   allocation_id = "${element(aws_eip.public.*.id, count.index)}"
   subnet_id     = "${element(aws_subnet.public.*.id, count.index)}"
+  depends_on    = ["aws_subnet.public"]
 
   lifecycle {
     create_before_destroy = true
@@ -94,13 +94,12 @@ resource "aws_nat_gateway" "public" {
 
   tags = "${
     merge(
+      module.public_label.tags,
       map(
         "Name", "${module.public_label.id}${var.delimiter}${element(var.availability_zones, count.index)}",
-        "Namespace", "${module.public_label.namespace}",
-        "Stage", "${module.public_label.stage}",
         "AZ", "${element(var.availability_zones, count.index)}",
         "Type", "${var.type}"
-      ), module.public_label.tags
+      )
     )
   }"
 }
