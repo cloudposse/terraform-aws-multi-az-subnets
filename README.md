@@ -155,6 +155,34 @@ for example:
 `lookup(private_az_subnet_ids, "us-east-1b")`
 
 
+## NAT Gateways
+
+For public subnets, `nat_gateway_enabled` flag controls the creation of NAT Gateways. Set it to `false` to disable NAT Gateways in public subnets.
+
+For private subnets, `nat_gateway_enabled` flag controls the routing of the private subnets to NAT Gateways.
+If you don't need to route the private subnets to NAT Gateways, set the flag to `false` and don't specify the NAT Gateway IDs in the `var.az_ngw_ids` map (leave the values empty).
+
+For example:
+
+```
+module "private_subnets" {
+  source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
+  namespace           = "${var.namespace}"
+  stage               = "${var.stage}"
+  name                = "${var.name}"
+  vpc_id              = "${module.vpc.vpc_id}"
+  cidr_block          = "${local.private_cidr_block}"
+  type                = "private"
+  nat_gateway_enabled = "false"
+  az_ngw_ids          = {
+    us-east-1a = ""
+    us-east-1b = ""
+    us-east-1c = ""
+  }
+}
+```
+
+
 ## License
 
 Apache 2 License. See [`LICENSE`](LICENSE) for full details.
