@@ -1,7 +1,6 @@
 locals {
   private_count       = "${var.enabled == "true" && var.type == "private" ? length(var.availability_zones) : 0}"
   private_route_count = "${var.enabled == "true" && var.type == "private" ? length(var.az_ngw_ids) : 0}"
-  az_route_table_ids  = "${zipmap(var.availability_zones, matchkeys(aws_route_table.private.*.id, aws_route_table.private.*.tags.AZ, var.availability_zones))}"
 }
 
 module "private_label" {
@@ -67,8 +66,8 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_route" "default" {
-  count                  = "${local.private_route_count}"
-  route_table_id         = "${lookup(local.az_route_table_ids, element(keys(var.az_ngw_ids), count.index))}"
+  count = "${local.private_count}"
+  route_table_id         = "${lookup(zipmap(var.availability_zones, matchkeys(aws_route_table.private.*.id, aws_route_table.private.*.tags.AZ, var.availability_zones)), element(keys(var.az_ngw_ids), count.index))}"
   nat_gateway_id         = "${lookup(var.az_ngw_ids, element(keys(var.az_ngw_ids), count.index))}"
   destination_cidr_block = "0.0.0.0/0"
   depends_on             = ["aws_route_table.private"]
