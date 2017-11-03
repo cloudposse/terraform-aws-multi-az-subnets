@@ -66,7 +66,7 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_route" "default" {
-  count = "${local.private_count}"
+  count                  = "${local.private_count}"
   route_table_id         = "${lookup(zipmap(var.availability_zones, matchkeys(aws_route_table.private.*.id, aws_route_table.private.*.tags.AZ, var.availability_zones)), element(keys(var.az_ngw_ids), count.index))}"
   nat_gateway_id         = "${lookup(var.az_ngw_ids, element(keys(var.az_ngw_ids), count.index))}"
   destination_cidr_block = "0.0.0.0/0"
