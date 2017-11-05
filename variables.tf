@@ -38,7 +38,7 @@ variable "availability_zones" {
 }
 
 variable "max_subnets" {
-  default     = "16"
+  default     = "6"
   description = "Maximum number of subnets that can be created. The variable is used for CIDR blocks calculation"
 }
 
