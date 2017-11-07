@@ -16,7 +16,7 @@ module "private_label" {
 
 resource "aws_subnet" "private" {
   count             = "${local.private_count}"
-  vpc_id            = "${data.aws_vpc.default.id}"
+  vpc_id            = "${var.vpc_id}"
   availability_zone = "${element(var.availability_zones, count.index)}"
   cidr_block        = "${cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), count.index)}"
 
@@ -34,7 +34,7 @@ resource "aws_subnet" "private" {
 
 resource "aws_network_acl" "private" {
   count      = "${var.enabled == "true" && var.type == "private" && signum(length(var.private_network_acl_id)) == 0 ? 1 : 0}"
-  vpc_id     = "${data.aws_vpc.default.id}"
+  vpc_id     = "${var.vpc_id}"
   subnet_ids = ["${aws_subnet.private.*.id}"]
   egress     = "${var.private_network_acl_egress}"
   ingress    = "${var.private_network_acl_ingress}"
@@ -44,7 +44,7 @@ resource "aws_network_acl" "private" {
 
 resource "aws_route_table" "private" {
   count  = "${local.private_count}"
-  vpc_id = "${data.aws_vpc.default.id}"
+  vpc_id = "${var.vpc_id}"
 
   tags = "${
     merge(
