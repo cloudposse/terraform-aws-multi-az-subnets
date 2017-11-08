@@ -102,9 +102,16 @@ module "private_subnets" {
 Given the following configuration
 
 ```hcl
+  source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=master"
+  namespace  = "${var.namespace}"
+  name       = "vpc"
+  stage      = "${var.stage}"
+  cidr_block = "${var.cidr_block}"
+}
+
 locals {
-  public_cidr_block  = "${cidrsubnet(var.vpc_cidr, 1, 0)}"
-  private_cidr_block = "${cidrsubnet(var.vpc_cidr, 1, 1)}"
+  public_cidr_block  = "${cidrsubnet(module.vpc.vpc_cidr_block, 1, 0)}"
+  private_cidr_block = "${cidrsubnet(module.vpc.vpc_cidr_block, 1, 1)}"
 }
 
 module "public_subnets" {
