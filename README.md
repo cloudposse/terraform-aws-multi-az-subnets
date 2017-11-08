@@ -49,8 +49,15 @@ module "private_subnets" {
   vpc_id              = "${module.vpc.vpc_id}"
   cidr_block          = "${local.private_cidr_block}"
   type                = "private"
-  # Map of AZ names to NAT Gateway IDs was created in "public_subnets" module. Assign it to `az_ngw_ids` input
+
+  # Map of AZ names to NAT Gateway IDs that was created in "public_subnets" module
   az_ngw_ids          = "${module.public_subnets.az_ngw_ids}"
+
+  # Need to explicitly provide the count since Terraform currently can't use dynamic count on computed resources from different modules
+  # https://github.com/hashicorp/terraform/issues/10857
+  # https://github.com/hashicorp/terraform/issues/12125
+  # https://github.com/hashicorp/terraform/issues/4149
+  az_ngw_count = 3
 }
 ```
 
@@ -71,7 +78,6 @@ module "private_subnets" {
 | `vpc_id`                      | ``                    | VPC ID where subnets are created (_e.g._ `vpc-aceb2723`)                                                                                                                                  |   Yes    |
 | `cidr_block`                  | ``                    | Base CIDR block which is divided into subnet CIDR blocks (_e.g._ `10.0.0.0/24`)                                                                                                           |    No    |
 | `igw_id`                      | ``                    | Only for public subnets. Internet Gateway ID which is used as a default route when creating public subnets (_e.g._ `igw-9c26a123`)                                                        |   Yes    |
-| `az_ngw_ids`                  | {}                    | Only for private subnets. Map of AZ names to NAT Gateway IDs which are used as default routes when creating private subnets                                                               |    No    |
 | `public_network_acl_id`       | ``                    | ID of Network ACL which is added to the public subnets. If empty, a new ACL will be created                                                                                               |    No    |
 | `private_network_acl_id`      | ``                    | ID of Network ACL which is added to the private subnets. If empty, a new ACL will be created                                                                                              |    No    |
 | `public_network_acl_egress`   | see [variables.tf](https://github.com/cloudposse/terraform-aws-multi-az-subnets/blob/master/variables.tf)    | Egress rules which are added to the new Public Network ACL                                         |    No    |
@@ -80,15 +86,17 @@ module "private_subnets" {
 | `private_network_acl_ingress` | see [variables.tf](https://github.com/cloudposse/terraform-aws-multi-az-subnets/blob/master/variables.tf)    | Ingress rules which are added to the new Private Network ACL                                       |    No    |
 | `enabled`                     | `true`                | Set to `false` to prevent the module from creating any resources                                                                                                                          |    No    |
 | `nat_gateway_enabled`         | `true`                | Flag to enable/disable NAT Gateways creation in public subnets                                                                                                                            |    No    |
+| `az_ngw_ids`                  | {}                    | Map of AZ names to NAT Gateway IDs which are used as default routes when creating private subnets. Only for private subnets                                                               |    No    |
+| `az_ngw_count`                | 0                     | Count of items in the `az_ngw_ids` map. Needs to be explicitly provided since Terraform currently can't use dynamic count on computed resources from different modules. https://github.com/hashicorp/terraform/issues/10857    |    No    |
 
 
 ## Outputs
 
-| Name                      | Description                                                                                            |
-|:--------------------------|:-------------------------------------------------------------------------------------------------------|
-| az_subnet_ids             | Map of AZ names to subnet IDs                                                                          |
-| az_route_table_ids        | Map of AZ names to Route Table IDs                                                                     |
-| az_ngw_ids                | Map of AZ names to NAT Gateway IDs (only for public subnets; for private subnets returns an empty map) |
+| Name                      | Description                                                    |
+|:--------------------------|:---------------------------------------------------------------|
+| az_subnet_ids             | Map of AZ names to subnet IDs                                  |
+| az_route_table_ids        | Map of AZ names to Route Table IDs                             |
+| az_ngw_ids                | Map of AZ names to NAT Gateway IDs (only for public subnets)   |
 
 
 Given the following configuration
@@ -121,8 +129,8 @@ module "private_subnets" {
   vpc_id              = "${module.vpc.vpc_id}"
   cidr_block          = "${local.private_cidr_block}"
   type                = "private"
-  # Map of AZ names to NAT Gateway IDs was created in "public_subnets" module. Assign it to `az_ngw_ids` input
   az_ngw_ids          = "${module.public_subnets.az_ngw_ids}"
+  az_ngw_count        = 3
 }
 
 output "private_az_subnet_ids" {

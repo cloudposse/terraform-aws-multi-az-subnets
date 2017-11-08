@@ -7,5 +7,5 @@ output "az_route_table_ids" {
 }
 
 output "az_ngw_ids" {
-  value = "${local.public_nat_gateways_count > 0 ? zipmap(var.availability_zones, matchkeys(aws_nat_gateway.public.*.id, aws_nat_gateway.public.*.tags.AZ, var.availability_zones)) : map()}"
+  value = "${zipmap(var.availability_zones, matchkeys(aws_nat_gateway.public.*.id, aws_nat_gateway.public.*.tags.AZ, var.availability_zones))}"
 }
