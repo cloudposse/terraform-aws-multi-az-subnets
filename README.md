@@ -102,6 +102,7 @@ module "private_subnets" {
 Given the following configuration
 
 ```hcl
+module "vpc" {
   source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=master"
   namespace  = "${var.namespace}"
   name       = "vpc"
