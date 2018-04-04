@@ -173,11 +173,13 @@ for example:
 
 `lookup(private_az_subnet_ids, "us-east-1b")`
 
+<br/>
 
 ## Example of `terraform apply` outputs
 
 ![terraform-aws-multi-az-subnets](images/terraform-aws-multi-az-subnets.png)
 
+<br/>
 
 ## Help
 
