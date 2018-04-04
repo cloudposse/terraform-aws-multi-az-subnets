@@ -1,16 +1,16 @@
 variable "namespace" {
-  description = "Namespace (e.g. `cp` or `cloudposse`)"
   type        = "string"
+  description = "Namespace (e.g. `cp` or `cloudposse`)"
 }
 
 variable "stage" {
-  description = "Stage (e.g. `prod`, `dev`, `staging`)"
   type        = "string"
+  description = "Stage (e.g. `prod`, `dev`, `staging`)"
 }
 
 variable "name" {
   type        = "string"
-  description = "Application or solution name"
+  description = "Name (e.g. `app`)"
 }
 
 variable "vpc_id" {
@@ -20,6 +20,7 @@ variable "vpc_id" {
 
 variable "cidr_block" {
   type        = "string"
+  default     = "10.0.0.0/16"
   description = "Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`)"
 }
 

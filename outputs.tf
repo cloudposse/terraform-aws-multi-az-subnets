@@ -7,5 +7,5 @@ output "az_route_table_ids" {
 }
 
 output "az_ngw_ids" {
-  value = "${zipmap(var.availability_zones, matchkeys(aws_nat_gateway.public.*.id, aws_nat_gateway.public.*.tags.AZ, var.availability_zones))}"
+  value = "${zipmap(var.availability_zones, coalescelist(matchkeys(aws_nat_gateway.public.*.id, aws_nat_gateway.public.*.tags.AZ, var.availability_zones), local.dummy_az_ngw_ids))}"
 }
