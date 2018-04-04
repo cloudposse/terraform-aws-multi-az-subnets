@@ -27,4 +27,5 @@ variable "cidr_block" {
 variable "igw_id" {
   type        = "string"
   description = "Internet Gateway ID that is used as a default route when creating public subnets (e.g. `igw-9c26a123`)"
+  default     = ""
 }
