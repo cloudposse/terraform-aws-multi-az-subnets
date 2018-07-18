@@ -1,0 +1,194 @@
+---
+#
+# This is the canonical configuration for the `README.md`
+# Run `make readme` to rebuild the `README.md`
+#
+
+# Name of this project
+name: terraform-aws-multi-az-subnets
+
+# Logo for this project
+#logo: docs/logo.png
+
+# License of this project
+license: "APACHE2"
+
+# Canonical GitHub repo
+github_repo: cloudposse/terraform-aws-multi-az-subnets
+
+# Badges to display
+badges:
+  - name: "Build Status"
+    image: "https://travis-ci.org/cloudposse/terraform-aws-multi-az-subnets.svg?branch=master"
+    url: "https://travis-ci.org/cloudposse/terraform-aws-multi-az-subnets"
+  - name: "Latest Release"
+    image: "https://img.shields.io/github/release/cloudposse/terraform-aws-multi-az-subnets.svg"
+    url: "https://github.com/cloudposse/terraform-aws-multi-az-subnets/releases/latest"
+  - name: "Slack Community"
+    image: "https://slack.cloudposse.com/badge.svg"
+    url: "https://slack.cloudposse.com"
+
+related:
+  - name: "terraform-aws-named-subnets"
+    description: "Terraform module for named subnets provisioning."
+    url: "https://github.com/cloudposse/terraform-aws-named-subnets"
+  - name: "terraform-aws-dynamic-subnets"
+    description: "Terraform module for public and private subnets provisioning in existing VPC"
+    url: "https://github.com/cloudposse/terraform-aws-dynamic-subnets"
+  - name: "terraform-aws-vpc"
+    description: "Terraform Module that defines a VPC with public/private subnets across multiple AZs with Internet Gateways"
+    url: "https://github.com/cloudposse/terraform-aws-vpc"
+  - name: "terraform-aws-cloudwatch-flow-logs"
+    description: "Terraform module for enabling flow logs for vpc and subnets."
+    url: "https://github.com/cloudposse/terraform-aws-cloudwatch-flow-logs"
+
+# Short description of this project
+description: |-
+  Terraform module for multi-AZ [`subnets`](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Subnets.html) provisioning.
+
+  The module creates private and public subnets in the provided Availability Zones.
+
+  The public subnets are routed to the Internet Gateway specified by `var.igw_id`.
+
+  `nat_gateway_enabled` flag controls the creation of NAT Gateways in the public subnets.
+
+  The private subnets are routed to the NAT Gateways provided in the `var.az_ngw_ids` map.
+
+# How to use this project
+usage: |-
+  ```hcl
+  module "vpc" {
+    source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=master"
+    namespace  = "${var.namespace}"
+    name       = "vpc"
+    stage      = "${var.stage}"
+    cidr_block = "${var.cidr_block}"
+  }
+
+  locals {
+    public_cidr_block  = "${cidrsubnet(module.vpc.vpc_cidr_block, 1, 0)}"
+    private_cidr_block = "${cidrsubnet(module.vpc.vpc_cidr_block, 1, 1)}"
+  }
+
+  module "public_subnets" {
+    source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
+    namespace           = "${var.namespace}"
+    stage               = "${var.stage}"
+    name                = "${var.name}"
+    availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
+    vpc_id              = "${module.vpc.vpc_id}"
+    cidr_block          = "${local.public_cidr_block}"
+    type                = "public"
+    igw_id              = "${module.vpc.igw_id}"
+    nat_gateway_enabled = "true"
+  }
+
+  module "private_subnets" {
+    source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
+    namespace           = "${var.namespace}"
+    stage               = "${var.stage}"
+    name                = "${var.name}"
+    availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
+    vpc_id              = "${module.vpc.vpc_id}"
+    cidr_block          = "${local.private_cidr_block}"
+    type                = "private"
+
+    # Map of AZ names to NAT Gateway IDs that was created in "public_subnets" module
+    az_ngw_ids          = "${module.public_subnets.az_ngw_ids}"
+
+    # Need to explicitly provide the count since Terraform currently can't use dynamic count on computed resources from different modules
+    # https://github.com/hashicorp/terraform/issues/10857
+    # https://github.com/hashicorp/terraform/issues/12125
+    # https://github.com/hashicorp/terraform/issues/4149
+    az_ngw_count = 3
+  }
+  ```
+examples: |-
+  Given the following configuration
+
+  ```hcl
+  module "vpc" {
+    source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=master"
+    namespace  = "${var.namespace}"
+    name       = "vpc"
+    stage      = "${var.stage}"
+    cidr_block = "${var.cidr_block}"
+  }
+
+  locals {
+    public_cidr_block  = "${cidrsubnet(module.vpc.vpc_cidr_block, 1, 0)}"
+    private_cidr_block = "${cidrsubnet(module.vpc.vpc_cidr_block, 1, 1)}"
+  }
+
+  module "public_subnets" {
+    source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
+    namespace           = "${var.namespace}"
+    stage               = "${var.stage}"
+    name                = "${var.name}"
+    availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
+    vpc_id              = "${module.vpc.vpc_id}"
+    cidr_block          = "${local.public_cidr_block}"
+    type                = "public"
+    igw_id              = "${module.vpc.igw_id}"
+    nat_gateway_enabled = "true"
+  }
+
+  module "private_subnets" {
+    source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
+    namespace           = "${var.namespace}"
+    stage               = "${var.stage}"
+    name                = "${var.name}"
+    availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
+    vpc_id              = "${module.vpc.vpc_id}"
+    cidr_block          = "${local.private_cidr_block}"
+    type                = "private"
+    az_ngw_ids          = "${module.public_subnets.az_ngw_ids}"
+    az_ngw_count        = 3
+  }
+
+  output "private_az_subnet_ids" {
+    value = "${module.private_subnets.az_subnet_ids}"
+  }
+
+  output "public_az_subnet_ids" {
+    value = "${module.public_subnets.az_subnet_ids}"
+  }
+  ```
+
+  the output Maps of AZ names to subnet IDs look like these
+
+  ```hcl
+  public_az_subnet_ids = {
+    us-east-1a = subnet-ea58d78e
+    us-east-1b = subnet-556ee131
+    us-east-1c = subnet-6f54db0b
+  }
+  private_az_subnet_ids = {
+    us-east-1a = subnet-376de253
+    us-east-1b = subnet-9e53dcfa
+    us-east-1c = subnet-a86fe0cc
+  }
+  ```
+
+  and the created subnet IDs could be found by the AZ names using `map["key"]` or [`lookup(map, key, [default])`](https://www.terraform.io/docs/configuration/interpolation.html#lookup-map-key-default-),
+
+  for example:
+
+  `public_az_subnet_ids["us-east-1a"]`
+
+  `lookup(private_az_subnet_ids, "us-east-1b")`
+  <br/>
+
+screenshots:
+  - name: "terraform-aws-multi-az-subnets"
+    description: "Example of `terraform apply` outputs"
+    url: "images/terraform-aws-multi-az-subnets.png"
+
+include:
+  - "docs/targets.md"
+  - "docs/terraform.md"
+
+# Contributors to this project
+contributors:
+  - name: "Andriy Knysh"
+    github: "aknysh"
