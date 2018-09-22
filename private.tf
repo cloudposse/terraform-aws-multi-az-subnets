@@ -1,6 +1,6 @@
 locals {
   private_count       = "${var.enabled == "true" && var.type == "private" ? length(var.availability_zones) : 0}"
-  private_route_count = "${var.enabled == "true" && var.type == "private" ? length(var.az_ngw_count) : 0}"
+  private_route_count = "${var.enabled == "true" && var.type == "private" ? var.az_ngw_count : 0}"
 }
 
 module "private_label" {
