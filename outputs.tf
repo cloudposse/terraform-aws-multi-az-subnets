@@ -12,3 +12,8 @@ output "az_ngw_ids" {
   value       = "${zipmap(var.availability_zones, coalescelist(aws_nat_gateway.public.*.id, local.dummy_az_ngw_ids))}"
   description = "Map of AZ names to NAT Gateway IDs (only for public subnets)"
 }
+
+output "az_subnet_arns" {
+  value       = "${zipmap(var.availability_zones, coalescelist(aws_subnet.private.*.arn, aws_subnet.public.*.arn))}"
+  description = "Map of AZ names to subnet arns"
+}
