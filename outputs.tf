@@ -15,5 +15,5 @@ output "az_ngw_ids" {
 
 output "az_subnet_arns" {
   value       = "${zipmap(var.availability_zones, coalescelist(aws_subnet.private.*.arn, aws_subnet.public.*.arn))}"
-  description = "Map of AZ names to subnet arns"
+  description = "Map of AZ names to subnet ARNs"
 }
