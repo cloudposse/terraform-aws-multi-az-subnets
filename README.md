@@ -225,7 +225,7 @@ Available targets:
 |------|-------------|
 | az_ngw_ids | Map of AZ names to NAT Gateway IDs (only for public subnets) |
 | az_route_table_ids | Map of AZ names to Route Table IDs |
-| az_subnet_arns | Map of AZ names to subnet arns |
+| az_subnet_arns | Map of AZ names to subnet ARNs |
 | az_subnet_ids | Map of AZ names to subnet IDs |
 
 
