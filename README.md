@@ -192,7 +192,6 @@ Available targets:
   lint                                Lint terraform code
 
 ```
-
 ## Inputs
 
 | Name | Description | Type | Default | Required |
@@ -226,6 +225,7 @@ Available targets:
 |------|-------------|
 | az_ngw_ids | Map of AZ names to NAT Gateway IDs (only for public subnets) |
 | az_route_table_ids | Map of AZ names to Route Table IDs |
+| az_subnet_arns | Map of AZ names to subnet ARNs |
 | az_subnet_ids | Map of AZ names to subnet IDs |
 
 
@@ -307,7 +307,7 @@ In general, PRs are welcome. We follow the typical "fork-and-pull" Git workflow.
 
 ## Copyright
 
-Copyright © 2017-2018 [Cloud Posse, LLC](https://cpco.io/copyright)
+Copyright © 2017-2019 [Cloud Posse, LLC](https://cpco.io/copyright)
 
 
 
