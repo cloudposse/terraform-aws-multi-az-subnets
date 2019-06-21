@@ -10,21 +10,21 @@ module "private_label" {
   stage      = var.stage
   delimiter  = var.delimiter
   tags       = var.tags
-  attributes = [compact(concat(var.attributes, ["private"]))]
+  attributes = compact(concat(var.attributes, ["private"]))
   enabled    = var.enabled
 }
 
 resource "aws_subnet" "private" {
   count             = local.private_count
   vpc_id            = var.vpc_id
-  availability_zone = element(var.availability_zones, count.index)
+  availability_zone = var.availability_zones[count.index]
   cidr_block        = cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), count.index)
 
   tags = merge(
     module.private_label.tags,
     {
       "Name" = "${module.private_label.id}${var.delimiter}${element(var.availability_zones, count.index)}"
-      "AZ"   = element(var.availability_zones, count.index)
+      "AZ"   = var.availability_zones[count.index]
       "Type" = var.type
     },
   )
