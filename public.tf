@@ -10,7 +10,7 @@ module "public_label" {
   stage      = var.stage
   delimiter  = var.delimiter
   tags       = var.tags
-  attributes = [compact(concat(var.attributes, ["public"]))]
+  attributes = compact(concat(var.attributes, ["public"]))
   enabled    = var.enabled
 }
 

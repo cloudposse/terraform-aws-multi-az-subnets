@@ -10,7 +10,7 @@ module "private_label" {
   stage      = var.stage
   delimiter  = var.delimiter
   tags       = var.tags
-  attributes = [compact(concat(var.attributes, ["private"]))]
+  attributes = compact(concat(var.attributes, ["private"]))
   enabled    = var.enabled
 }
 
