@@ -44,7 +44,7 @@ variable "max_subnets" {
 
 variable "type" {
   type        = string
-  default     = "private"
+  default     = null
   description = "Type of subnets to create (`private` or `public`)"
 }
 
