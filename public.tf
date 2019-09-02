@@ -1,6 +1,6 @@
 locals {
   public_count              = var.enabled == "true" && var.type == "public" ? length(var.availability_zones) : 0
-  public_nat_gateways_count = var.enabled == "true" && var.type == "public" && var.nat_gateway_enabled == "true" ? length(var.availability_zones) : 0
+  public_nat_gateways_count = var.enabled == "true" ? (var.type == "public" ? (var.nat_gateway_enabled == "true" ? length(var.availability_zones) : 0) : 0) : 0
 }
 
 module "public_label" {
@@ -15,7 +15,7 @@ module "public_label" {
 }
 
 resource "aws_subnet" "public" {
-  count             = 3
+  count             = local.public_count
   vpc_id            = var.vpc_id
   availability_zone = element(var.availability_zones, count.index)
   cidr_block        = cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), count.index)
@@ -112,20 +112,20 @@ resource "aws_eip" "public" {
   count = local.public_nat_gateways_count
   vpc   = true
 
-  # lifecycle {
-  #   create_before_destroy = true
-  # }
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_nat_gateway" "public" {
-  count         = 3
+  count         = local.public_nat_gateways_count
   allocation_id = element(aws_eip.public.*.id, count.index)
   subnet_id     = element(aws_subnet.public.*.id, count.index)
   depends_on    = [aws_subnet.public]
 
-  # lifecycle {
-  #   create_before_destroy = true
-  # }
+  lifecycle {
+    create_before_destroy = true
+  }
 
   tags = merge(
     module.public_label.tags,
