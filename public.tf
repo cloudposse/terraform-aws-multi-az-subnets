@@ -112,9 +112,9 @@ resource "aws_eip" "public" {
   count = local.public_nat_gateways_count
   vpc   = true
 
-  lifecycle {
-    create_before_destroy = true
-  }
+  # lifecycle {
+  #   create_before_destroy = true
+  # }
 }
 
 resource "aws_nat_gateway" "public" {
@@ -123,9 +123,9 @@ resource "aws_nat_gateway" "public" {
   subnet_id     = element(aws_subnet.public.*.id, count.index)
   depends_on    = [aws_subnet.public]
 
-  lifecycle {
-    create_before_destroy = true
-  }
+  # lifecycle {
+  #   create_before_destroy = true
+  # }
 
   tags = merge(
     module.public_label.tags,
