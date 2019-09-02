@@ -162,6 +162,6 @@ locals {
       "0",
     ],
     0,
-    length(var.availability_zones),
+    3,
   )]
 }
