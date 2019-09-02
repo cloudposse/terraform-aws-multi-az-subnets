@@ -72,8 +72,8 @@ resource "aws_network_acl" "public" {
       to_port         = lookup(ingress.value, "to_port", null)
     }
   }
-  tags       = module.public_label.tags
-  depends_on = [aws_subnet.public]
+  tags = module.public_label.tags
+  #depends_on = [aws_subnet.public]
 }
 
 resource "aws_route_table" "public" {
@@ -95,17 +95,17 @@ resource "aws_route" "public" {
   route_table_id         = element(aws_route_table.public.*.id, count.index)
   gateway_id             = var.igw_id
   destination_cidr_block = "0.0.0.0/0"
-  depends_on             = [aws_route_table.public]
+  #depends_on             = [aws_route_table.public]
 }
 
 resource "aws_route_table_association" "public" {
   count          = local.public_count
   subnet_id      = element(aws_subnet.public.*.id, count.index)
   route_table_id = element(aws_route_table.public.*.id, count.index)
-  depends_on = [
-    aws_subnet.public,
-    aws_route_table.public,
-  ]
+  #depends_on = [
+  #  aws_subnet.public,
+  #  aws_route_table.public,
+  #]
 }
 
 resource "aws_eip" "public" {
@@ -121,7 +121,7 @@ resource "aws_nat_gateway" "public" {
   count         = local.public_nat_gateways_count
   allocation_id = element(aws_eip.public.*.id, count.index)
   subnet_id     = element(aws_subnet.public.*.id, count.index)
-  depends_on    = [aws_subnet.public]
+  #depends_on    = [aws_subnet.public]
 
   lifecycle {
     create_before_destroy = true
