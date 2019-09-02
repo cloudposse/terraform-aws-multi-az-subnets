@@ -1,7 +1,8 @@
 locals {
   public_count              = var.enabled == "true" && var.type == "public" ? length(var.availability_zones) : 0
   public_nat_gateways_count = var.enabled == "true" && var.type == "public" && var.nat_gateway_enabled == "true" ? length(var.availability_zones) : 0
-  dummy_az_ngw_ids          = [slice(["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"], 0, 3, )]
+  dummy_az_ngw_ids_list     = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
+  dummy_az_ngw_ids          = [slice(local.dummy_az_ngw_ids_list, 0, 3)]
 }
 
 module "public_label" {
