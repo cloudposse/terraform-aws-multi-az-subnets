@@ -1,6 +1,5 @@
 locals {
-  is_public                 = var.type == "public" ? true : false
-  public_count              = var.enabled == "true" && local.is_public ? length(var.availability_zones) : 0
+  public_count              = var.enabled == "true" && var.type == "public" ? length(var.availability_zones) : 0
   public_nat_gateways_count = var.enabled == "true" && var.type == "public" && var.nat_gateway_enabled == "true" ? length(var.availability_zones) : 0
 }
 
@@ -16,7 +15,7 @@ module "public_label" {
 }
 
 resource "aws_subnet" "public" {
-  count             = local.public_count
+  count             = 3
   vpc_id            = var.vpc_id
   availability_zone = element(var.availability_zones, count.index)
   cidr_block        = cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), count.index)
@@ -119,7 +118,7 @@ resource "aws_eip" "public" {
 }
 
 resource "aws_nat_gateway" "public" {
-  count         = local.public_nat_gateways_count
+  count         = 3
   allocation_id = element(aws_eip.public.*.id, count.index)
   subnet_id     = element(aws_subnet.public.*.id, count.index)
   depends_on    = [aws_subnet.public]
