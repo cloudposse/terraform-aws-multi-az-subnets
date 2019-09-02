@@ -1,8 +1,6 @@
 locals {
   public_count              = var.enabled == "true" && var.type == "public" ? length(var.availability_zones) : 0
   public_nat_gateways_count = var.enabled == "true" && var.type == "public" && var.nat_gateway_enabled == "true" ? length(var.availability_zones) : 0
-  dummy_az_ngw_ids_list     = ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"]
-  dummy_az_ngw_ids          = [slice(local.dummy_az_ngw_ids_list, 0, 3)]
 }
 
 module "public_label" {
@@ -141,3 +139,29 @@ resource "aws_nat_gateway" "public" {
 
 # Dummy list of NAT Gateway IDs to use in the outputs for private subnets and when `nat_gateway_enabled=false` for public subnets
 # Needed due to Terraform limitation of not allowing using conditionals with maps and lists
+locals {
+  dummy_az_ngw_ids = slice(
+    [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+    ],
+    0,
+    length(var.availability_zones),
+  )
+}
