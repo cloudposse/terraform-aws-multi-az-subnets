@@ -1,6 +1,6 @@
 locals {
-  public_count              = var.enabled == "true" ? (var.type == "public" ? length(var.availability_zones) : 0) : 0
-  public_nat_gateways_count = var.enabled == "true" ? (var.type == "public" ? (var.nat_gateway_enabled == "true" ? length(var.availability_zones) : 0) : 0) : 0
+  public_count              = (var.enabled == "true" ? (var.type == "public" ? length(var.availability_zones) : 0) : 0)
+  public_nat_gateways_count = (var.enabled == "true" ? (var.type == "public" ? (var.nat_gateway_enabled == "true" ? length(var.availability_zones) : 0) : 0) : 0)
 }
 
 module "public_label" {
