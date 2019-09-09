@@ -76,7 +76,31 @@ variable "public_network_acl_id" {
   default     = ""
 }
 
+variable "dmz_network_acl_id" {
+  type        = string
+  description = "Network ACL ID that is added to the public subnets. If empty, a new ACL will be created"
+  default     = ""
+}
+
 variable "private_network_acl_id" {
+  type        = string
+  description = "Network ACL ID that is added to the private subnets. If empty, a new ACL will be created"
+  default     = ""
+}
+
+variable "prod_network_acl_id" {
+  type        = string
+  description = "Network ACL ID that is added to the private subnets. If empty, a new ACL will be created"
+  default     = ""
+}
+
+variable "stage_network_acl_id" {
+  type        = string
+  description = "Network ACL ID that is added to the private subnets. If empty, a new ACL will be created"
+  default     = ""
+}
+
+variable "dev_network_acl_id" {
   type        = string
   description = "Network ACL ID that is added to the private subnets. If empty, a new ACL will be created"
   default     = ""
