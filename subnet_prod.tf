@@ -100,7 +100,7 @@ resource "aws_route_table_association" "prod" {
   ]
 }
 
-resource "aws_route" "default" {
+resource "aws_route" "prod_default" {
   count = local.prod_route_count
   route_table_id = zipmap(
     var.availability_zones,
