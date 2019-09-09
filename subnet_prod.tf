@@ -54,7 +54,7 @@ resource "aws_network_acl" "prod" {
     }
   }
   dynamic "ingress" {
-    for_each = var.prod_network_acl_ingress
+    for_each = var.private_network_acl_ingress
     content {
       # TF-UPGRADE-TODO: The automatic upgrade tool can't predict
       # which keys might be set in maps assigned here, so it has
