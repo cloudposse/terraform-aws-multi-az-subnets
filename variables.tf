@@ -94,6 +94,12 @@ variable "prod_network_acl_id" {
   default     = ""
 }
 
+variable "test_network_acl_id" {
+  type        = string
+  description = "Network ACL ID that is added to the private subnets. If empty, a new ACL will be created"
+  default     = ""
+}
+
 variable "stage_network_acl_id" {
   type        = string
   description = "Network ACL ID that is added to the private subnets. If empty, a new ACL will be created"
