@@ -140,7 +140,7 @@ resource "aws_nat_gateway" "dmz" {
 # Dummy list of NAT Gateway IDs to use in the outputs for private subnets and when `nat_gateway_enabled=false` for dmz subnets
 # Needed due to Terraform limitation of not allowing using conditionals with maps and lists
 locals {
-  dummy_az_ngw_ids = slice(
+  dmz_dummy_az_ngw_ids = slice(
     [
       "0",
       "0",
