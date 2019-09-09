@@ -25,7 +25,7 @@ output "az_ngw_ids" {
 output "az_subnet_arns" {
   value = zipmap(
     var.availability_zones,
-    coalescelist(aws_subnet.prod.*.arn, aws_subnet.test.*.arn, aws_subnet.stage.*.arn, aws_subnet.dev.*.arn, aws_subnet.public.*.arn),
+    coalescelist(aws_subnet.prod.*.arn, aws_subnet.test.*.arn, aws_subnet.stage.*.arn, aws_subnet.dev.*.arn, aws_subnet.dmz.*.arn),
   )
   description = "Map of AZ names to subnet ARNs"
 }
