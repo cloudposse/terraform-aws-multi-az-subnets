@@ -138,6 +138,38 @@ variable "public_network_acl_ingress" {
   ]
 }
 
+variable "dmz_network_acl_egress" {
+  description = "Egress network ACL rules"
+  type        = list
+
+  default = [
+    {
+      rule_no    = 100
+      action     = "allow"
+      cidr_block = "0.0.0.0/0"
+      from_port  = 0
+      to_port    = 0
+      protocol   = "-1"
+    },
+  ]
+}
+
+variable "dmz_network_acl_ingress" {
+  description = "Egress network ACL rules"
+  type        = list
+
+  default = [
+    {
+      rule_no    = 100
+      action     = "allow"
+      cidr_block = "0.0.0.0/0"
+      from_port  = 0
+      to_port    = 0
+      protocol   = "-1"
+    },
+  ]
+}
+
 variable "private_network_acl_egress" {
   description = "Egress network ACL rules"
   type        = list
