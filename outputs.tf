@@ -9,7 +9,7 @@ output "az_subnet_ids" {
 output "az_route_table_ids" {
   value = zipmap(
     var.availability_zones,
-    coalescelist(aws_route_table.prod.*.id, aws_route_table.test.*.id, aws_route_table.stage.*.id, aws_route_table.dev.*.id, aws_route_table.public.*.id),
+    coalescelist(aws_route_table.prod.*.id, aws_route_table.test.*.id, aws_route_table.stage.*.id, aws_route_table.dev.*.id, aws_route_table.dmz.*.id),
   )
   description = " Map of AZ names to Route Table IDs"
 }
@@ -25,7 +25,7 @@ output "az_ngw_ids" {
 output "az_subnet_arns" {
   value = zipmap(
     var.availability_zones,
-    coalescelist(aws_subnet.private.*.arn, aws_subnet.public.*.arn),
+    coalescelist(aws_subnet.prod.*.arn, aws_subnet.test.*.arn, aws_subnet.stage.*.arn, aws_subnet.dev.*.arn, aws_subnet.public.*.arn),
   )
   description = "Map of AZ names to subnet ARNs"
 }
