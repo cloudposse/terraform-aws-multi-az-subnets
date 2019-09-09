@@ -186,7 +186,55 @@ variable "private_network_acl_egress" {
   ]
 }
 
-variable "private_network_acl_ingress" {
+variable "prod_network_acl_ingress" {
+  description = "Egress network ACL rules"
+  type        = list
+
+  default = [
+    {
+      rule_no    = 100
+      action     = "allow"
+      cidr_block = "0.0.0.0/0"
+      from_port  = 0
+      to_port    = 0
+      protocol   = "-1"
+    },
+  ]
+}
+
+variable "test_network_acl_ingress" {
+  description = "Egress network ACL rules"
+  type        = list
+
+  default = [
+    {
+      rule_no    = 100
+      action     = "allow"
+      cidr_block = "0.0.0.0/0"
+      from_port  = 0
+      to_port    = 0
+      protocol   = "-1"
+    },
+  ]
+}
+
+variable "stage_network_acl_ingress" {
+  description = "Egress network ACL rules"
+  type        = list
+
+  default = [
+    {
+      rule_no    = 100
+      action     = "allow"
+      cidr_block = "0.0.0.0/0"
+      from_port  = 0
+      to_port    = 0
+      protocol   = "-1"
+    },
+  ]
+}
+
+variable "dev_network_acl_ingress" {
   description = "Egress network ACL rules"
   type        = list
 
