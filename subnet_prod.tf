@@ -35,7 +35,7 @@ resource "aws_network_acl" "prod" {
   vpc_id     = var.vpc_id
   subnet_ids = aws_subnet.prod.*.id
   dynamic "egress" {
-    for_each = var.prod_network_acl_egress
+    for_each = var.private_network_acl_egress
     content {
       # TF-UPGRADE-TODO: The automatic upgrade tool can't predict
       # which keys might be set in maps assigned here, so it has
