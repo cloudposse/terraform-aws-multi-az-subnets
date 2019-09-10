@@ -1,6 +1,6 @@
 locals {
-  private_count       = var.enabled == "true" && var.type == "private" ? length(var.availability_zones) : 0
-  private_route_count = var.enabled == "true" && var.type == "private" ? var.az_ngw_count : 0
+  private_count       = var.enabled == "true" && var.type != "false" && var.type != "dmz" ? length(var.availability_zones) : 0
+  private_route_count = var.enabled == "true" && var.type != "false" && var.type != "dmz" ? var.az_ngw_count : 0
 }
 
 module "private_label" {
@@ -10,7 +10,7 @@ module "private_label" {
   stage      = var.stage
   delimiter  = var.delimiter
   tags       = var.tags
-  attributes = compact(concat(var.attributes, ["private"]))
+  attributes = compact(concat(var.attributes, var.type))
   enabled    = var.enabled
 }
 
@@ -31,7 +31,7 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_network_acl" "private" {
-  count      = var.enabled == "true" && var.type == "private" && signum(length(var.private_network_acl_id)) == 0 ? 1 : 0
+  count      = var.enabled == "true" && var.type != "false" && var.type != "dmz" && signum(length(var.private_network_acl_id)) == 0 ? 1 : 0
   vpc_id     = var.vpc_id
   subnet_ids = aws_subnet.private.*.id
   dynamic "egress" {
