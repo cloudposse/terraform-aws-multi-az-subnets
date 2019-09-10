@@ -1,7 +1,35 @@
+
+locals {
+  dummy_subnet_output = slice(
+    [
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+      "0",
+    ],
+    0,
+    length(var.availability_zones),
+  )
+}
+
 output "az_subnet_ids" {
   value = zipmap(
     var.availability_zones,
-    coalescelist(aws_subnet.prod.*.id, aws_subnet.test.*.id, aws_subnet.stage.*.id, aws_subnet.dev.*.id, aws_subnet.dmz.*.id),
+    coalescelist(aws_subnet.prod.*.id, aws_subnet.test.*.id, aws_subnet.stage.*.id, aws_subnet.dev.*.id, aws_subnet.dmz.*.id, local.dummy_subnet_output),
   )
   description = "Map of AZ names to subnet IDs"
 }
