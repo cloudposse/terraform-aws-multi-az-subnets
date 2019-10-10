@@ -4,13 +4,13 @@ locals {
 }
 
 module "public_label" {
-  source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.3.0"
+  source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.15.0"
   namespace  = var.namespace
   name       = var.name
   stage      = var.stage
   delimiter  = var.delimiter
   tags       = var.tags
-  attributes = [compact(concat(var.attributes, ["public"]))]
+  attributes = compact(concat(var.attributes, ["public"]))
   enabled    = var.enabled
 }
 
@@ -140,7 +140,7 @@ resource "aws_nat_gateway" "public" {
 # Dummy list of NAT Gateway IDs to use in the outputs for private subnets and when `nat_gateway_enabled=false` for public subnets
 # Needed due to Terraform limitation of not allowing using conditionals with maps and lists
 locals {
-  dummy_az_ngw_ids = [slice(
+  dummy_az_ngw_ids = slice(
     [
       "0",
       "0",
@@ -163,6 +163,6 @@ locals {
     ],
     0,
     length(var.availability_zones),
-  )]
+  )
 }
 

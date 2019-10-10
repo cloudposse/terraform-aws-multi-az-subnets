@@ -84,7 +84,7 @@ variable "private_network_acl_id" {
 
 variable "public_network_acl_egress" {
   description = "Egress network ACL rules"
-  type        = list(string)
+  type        = list(map(string))
 
   default = [
     {
@@ -100,7 +100,7 @@ variable "public_network_acl_egress" {
 
 variable "public_network_acl_ingress" {
   description = "Egress network ACL rules"
-  type        = list(string)
+  type        = list(map(string))
 
   default = [
     {
@@ -116,7 +116,7 @@ variable "public_network_acl_ingress" {
 
 variable "private_network_acl_egress" {
   description = "Egress network ACL rules"
-  type        = list(string)
+  type        = list(map(string))
 
   default = [
     {
@@ -132,7 +132,7 @@ variable "private_network_acl_egress" {
 
 variable "private_network_acl_ingress" {
   description = "Egress network ACL rules"
-  type        = list(string)
+  type        = list(map(string))
 
   default = [
     {
@@ -156,8 +156,8 @@ variable "nat_gateway_enabled" {
   default     = "true"
 }
 
-variable "az_ngw_count" {
-  description = "Count of items in the `az_ngw_ids` map. Needs to be explicitly provided since Terraform currently can't use dynamic count on computed resources from different modules. https://github.com/hashicorp/terraform/issues/10857"
-  default     = 0
-}
+//variable "az_ngw_count" {
+//  description = "Count of items in the `az_ngw_ids` map. Needs to be explicitly provided since Terraform currently can't use dynamic count on computed resources from different modules. https://github.com/hashicorp/terraform/issues/10857"
+//  default     = 0
+//}
 

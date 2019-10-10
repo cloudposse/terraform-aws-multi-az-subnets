@@ -52,51 +52,46 @@ It's 100% Open Source and licensed under the [APACHE2](LICENSE).
 
 ## Usage
 
+
+
 ```hcl
-module "vpc" {
-  source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=master"
-  namespace  = "${var.namespace}"
-  name       = "vpc"
-  stage      = "${var.stage}"
-  cidr_block = "${var.cidr_block}"
+locals {
+  public_cidr_block  = cidrsubnet(var.cidr_block, 1, 0)
+  private_cidr_block = cidrsubnet(var.cidr_block, 1, 1)
 }
 
-locals {
-  public_cidr_block  = "${cidrsubnet(module.vpc.vpc_cidr_block, 1, 0)}"
-  private_cidr_block = "${cidrsubnet(module.vpc.vpc_cidr_block, 1, 1)}"
+module "vpc" {
+  source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=master"
+  namespace  = var.namespace
+  stage      = var.stage
+  name       = var.name
+  cidr_block = var.cidr_block
 }
 
 module "public_subnets" {
   source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
-  namespace           = "${var.namespace}"
-  stage               = "${var.stage}"
-  name                = "${var.name}"
+  namespace           = var.namespace
+  stage               = var.stage
+  name                = var.name
   availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
-  vpc_id              = "${module.vpc.vpc_id}"
-  cidr_block          = "${local.public_cidr_block}"
+  vpc_id              = module.vpc.vpc_id
+  cidr_block          = local.public_cidr_block
   type                = "public"
-  igw_id              = "${module.vpc.igw_id}"
+  igw_id              = module.vpc.igw_id
   nat_gateway_enabled = "true"
 }
 
 module "private_subnets" {
-  source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
-  namespace           = "${var.namespace}"
-  stage               = "${var.stage}"
-  name                = "${var.name}"
-  availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
-  vpc_id              = "${module.vpc.vpc_id}"
-  cidr_block          = "${local.private_cidr_block}"
-  type                = "private"
+  source             = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
+  namespace          = var.namespace
+  stage              = var.stage
+  name               = var.name
+  availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  vpc_id             = module.vpc.vpc_id
+  cidr_block         = local.private_cidr_block
+  type               = "private"
 
-  # Map of AZ names to NAT Gateway IDs that was created in "public_subnets" module
-  az_ngw_ids          = "${module.public_subnets.az_ngw_ids}"
-
-  # Need to explicitly provide the count since Terraform currently can't use dynamic count on computed resources from different modules
-  # https://github.com/hashicorp/terraform/issues/10857
-  # https://github.com/hashicorp/terraform/issues/12125
-  # https://github.com/hashicorp/terraform/issues/4149
-  az_ngw_count = 3
+  az_ngw_ids = module.public_subnets.az_ngw_ids
 }
 ```
 
@@ -110,49 +105,48 @@ Given the following configuration
 ```hcl
 module "vpc" {
   source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=master"
-  namespace  = "${var.namespace}"
+  namespace  = var.namespace
   name       = "vpc"
-  stage      = "${var.stage}"
-  cidr_block = "${var.cidr_block}"
+  stage      = var.stage
+  cidr_block = var.cidr_block
 }
 
 locals {
-  public_cidr_block  = "${cidrsubnet(module.vpc.vpc_cidr_block, 1, 0)}"
-  private_cidr_block = "${cidrsubnet(module.vpc.vpc_cidr_block, 1, 1)}"
+  public_cidr_block  = cidrsubnet(module.vpc.vpc_cidr_block, 1, 0)
+  private_cidr_block = cidrsubnet(module.vpc.vpc_cidr_block, 1, 1)
 }
 
 module "public_subnets" {
   source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
-  namespace           = "${var.namespace}"
-  stage               = "${var.stage}"
-  name                = "${var.name}"
+  namespace           = var.namespace
+  stage               = var.stage
+  name                = var.name
   availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
-  vpc_id              = "${module.vpc.vpc_id}"
-  cidr_block          = "${local.public_cidr_block}"
+  vpc_id              = module.vpc.vpc_id
+  cidr_block          = local.public_cidr_block
   type                = "public"
-  igw_id              = "${module.vpc.igw_id}"
+  igw_id              = module.vpc.igw_id
   nat_gateway_enabled = "true"
 }
 
 module "private_subnets" {
   source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
-  namespace           = "${var.namespace}"
-  stage               = "${var.stage}"
-  name                = "${var.name}"
+  namespace           = var.namespace
+  stage               = var.stage
+  name                = var.name
   availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
-  vpc_id              = "${module.vpc.vpc_id}"
-  cidr_block          = "${local.private_cidr_block}"
+  vpc_id              = module.vpc.vpc_id
+  cidr_block          = local.private_cidr_block
   type                = "private"
-  az_ngw_ids          = "${module.public_subnets.az_ngw_ids}"
-  az_ngw_count        = 3
+  az_ngw_ids          = module.public_subnets.az_ngw_ids
 }
 
 output "private_az_subnet_ids" {
-  value = "${module.private_subnets.az_subnet_ids}"
+  value = module.private_subnets.az_subnet_ids
 }
 
 output "public_az_subnet_ids" {
-  value = "${module.public_subnets.az_subnet_ids}"
+  value = module.public_subnets.az_subnet_ids
 }
 ```
 
@@ -196,10 +190,9 @@ Available targets:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
-| attributes | Additional attributes (e.g. `policy` or `role`) | list | `<list>` | no |
-| availability_zones | List of Availability Zones (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`) | list | `<list>` | no |
-| az_ngw_count | Count of items in the `az_ngw_ids` map. Needs to be explicitly provided since Terraform currently can't use dynamic count on computed resources from different modules. https://github.com/hashicorp/terraform/issues/10857 | string | `0` | no |
-| az_ngw_ids | Only for private subnets. Map of AZ names to NAT Gateway IDs that are used as default routes when creating private subnets | map | `<map>` | no |
+| attributes | Additional attributes (e.g. `policy` or `role`) | list(string) | `<list>` | no |
+| availability_zones | List of Availability Zones (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`) | list(string) | `<list>` | no |
+| az_ngw_ids | Only for private subnets. Map of AZ names to NAT Gateway IDs that are used as default routes when creating private subnets | map(string) | `<map>` | no |
 | cidr_block | Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`) | string | - | yes |
 | delimiter | Delimiter to be used between `namespace`, `stage`, `name` and `attributes` | string | `-` | no |
 | enabled | Set to false to prevent the module from creating any resources | string | `true` | no |
@@ -208,14 +201,14 @@ Available targets:
 | name | Application or solution name | string | - | yes |
 | namespace | Namespace (e.g. `cp` or `cloudposse`) | string | - | yes |
 | nat_gateway_enabled | Flag to enable/disable NAT Gateways creation in public subnets | string | `true` | no |
-| private_network_acl_egress | Egress network ACL rules | list | `<list>` | no |
+| private_network_acl_egress | Egress network ACL rules | list(map(string)) | `<list>` | no |
 | private_network_acl_id | Network ACL ID that is added to the private subnets. If empty, a new ACL will be created | string | `` | no |
-| private_network_acl_ingress | Egress network ACL rules | list | `<list>` | no |
-| public_network_acl_egress | Egress network ACL rules | list | `<list>` | no |
+| private_network_acl_ingress | Egress network ACL rules | list(map(string)) | `<list>` | no |
+| public_network_acl_egress | Egress network ACL rules | list(map(string)) | `<list>` | no |
 | public_network_acl_id | Network ACL ID that is added to the public subnets. If empty, a new ACL will be created | string | `` | no |
-| public_network_acl_ingress | Egress network ACL rules | list | `<list>` | no |
+| public_network_acl_ingress | Egress network ACL rules | list(map(string)) | `<list>` | no |
 | stage | Stage (e.g. `prod`, `dev`, `staging`) | string | - | yes |
-| tags | Additional tags (e.g. map(`BusinessUnit`,`XYZ`) | map | `<map>` | no |
+| tags | Additional tags (e.g. map(`BusinessUnit`,`XYZ`) | map(string) | `<map>` | no |
 | type | Type of subnets to create (`private` or `public`) | string | `private` | no |
 | vpc_id | VPC ID | string | - | yes |
 
@@ -366,7 +359,7 @@ Check out [our other projects][github], [follow us on twitter][twitter], [apply 
 |---|
 
   [aknysh_homepage]: https://github.com/aknysh
-  [aknysh_avatar]: https://github.com/aknysh.png?size=150
+  [aknysh_avatar]: https://img.cloudposse.com/150x150/https://github.com/aknysh.png
 
 
 

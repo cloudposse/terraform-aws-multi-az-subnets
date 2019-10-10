@@ -1,30 +1,31 @@
 locals {
   private_count       = var.enabled == "true" && var.type == "private" ? length(var.availability_zones) : 0
-  private_route_count = var.enabled == "true" && var.type == "private" ? var.az_ngw_count : 0
+//  private_route_count = var.enabled == "true" && var.type == "private" ? var.az_ngw_count : 0
+  private_route_count = length(var.az_ngw_ids)
 }
 
 module "private_label" {
-  source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.3.0"
+  source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.15.0"
   namespace  = var.namespace
   name       = var.name
   stage      = var.stage
   delimiter  = var.delimiter
   tags       = var.tags
-  attributes = [compact(concat(var.attributes, ["private"]))]
+  attributes = compact(concat(var.attributes, ["private"]))
   enabled    = var.enabled
 }
 
 resource "aws_subnet" "private" {
   count             = local.private_count
   vpc_id            = var.vpc_id
-  availability_zone = element(var.availability_zones, count.index)
+  availability_zone = var.availability_zones[count.index]
   cidr_block        = cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), count.index)
 
   tags = merge(
     module.private_label.tags,
     {
       "Name" = "${module.private_label.id}${var.delimiter}${element(var.availability_zones, count.index)}"
-      "AZ"   = element(var.availability_zones, count.index)
+      "AZ"   = var.availability_zones[count.index]
       "Type" = var.type
     },
   )
