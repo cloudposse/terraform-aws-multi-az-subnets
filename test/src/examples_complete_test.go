@@ -2,7 +2,7 @@ package test
 
 import (
 	"testing"
-
+  "sort"
 	"github.com/gruntwork-io/terratest/modules/terraform"
 	"github.com/stretchr/testify/assert"
 )
