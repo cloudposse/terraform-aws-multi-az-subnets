@@ -156,8 +156,3 @@ variable "nat_gateway_enabled" {
   default     = "true"
 }
 
-//variable "az_ngw_count" {
-//  description = "Count of items in the `az_ngw_ids` map. Needs to be explicitly provided since Terraform currently can't use dynamic count on computed resources from different modules. https://github.com/hashicorp/terraform/issues/10857"
-//  default     = 0
-//}
-
