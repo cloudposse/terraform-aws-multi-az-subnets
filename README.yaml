@@ -38,9 +38,9 @@ github_repo: cloudposse/terraform-aws-multi-az-subnets
 
 # Badges to display
 badges:
-  - name: "Build Status"
-    image: "https://travis-ci.org/cloudposse/terraform-aws-multi-az-subnets.svg?branch=master"
-    url: "https://travis-ci.org/cloudposse/terraform-aws-multi-az-subnets"
+  - name: "Codefresh build status"
+    image: "https://g.codefresh.io/api/badges/pipeline/cloudposse/terraform-modules%2Fterraform-aws-multi-az-subnets?type=cf-1"
+    url: "https://g.codefresh.io/public/accounts/cloudposse/pipelines/5d2f6639a1d4a956082d61ac"
   - name: "Latest Release"
     image: "https://img.shields.io/github/release/cloudposse/terraform-aws-multi-az-subnets.svg"
     url: "https://github.com/cloudposse/terraform-aws-multi-az-subnets/releases/latest"
