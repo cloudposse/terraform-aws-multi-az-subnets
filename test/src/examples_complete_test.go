@@ -30,7 +30,7 @@ func TestExamplesComplete(t *testing.T) {
 
 // 	expectedPrivateSubnetCidrs := []string{"172.16.0.0/18", "172.16.64.0/18"}
 	// Verify we're getting back the outputs we expect
-	assert.Equal(t, 3, len(privateSubnetIds)
+	assert.Equal(t, 3, len(privateSubnetIds))
 
 // 	// Run `terraform output` to get the value of an output variable
 // 	publicSubnetCidrs := terraform.OutputList(t, terraformOptions, "public_subnet_cidrs")

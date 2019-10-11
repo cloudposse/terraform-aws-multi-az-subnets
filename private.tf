@@ -1,6 +1,5 @@
 locals {
   private_count       = var.enabled == "true" && var.type == "private" ? length(var.availability_zones) : 0
-//  private_route_count = var.enabled == "true" && var.type == "private" ? var.az_ngw_count : 0
   private_route_count = length(var.az_ngw_ids)
 }
 
@@ -38,11 +37,6 @@ resource "aws_network_acl" "private" {
   dynamic "egress" {
     for_each = var.private_network_acl_egress
     content {
-      # TF-UPGRADE-TODO: The automatic upgrade tool can't predict
-      # which keys might be set in maps assigned here, so it has
-      # produced a comprehensive set here. Consider simplifying
-      # this after confirming which keys can be set in practice.
-
       action          = lookup(egress.value, "action", null)
       cidr_block      = lookup(egress.value, "cidr_block", null)
       from_port       = lookup(egress.value, "from_port", null)
@@ -57,11 +51,6 @@ resource "aws_network_acl" "private" {
   dynamic "ingress" {
     for_each = var.private_network_acl_ingress
     content {
-      # TF-UPGRADE-TODO: The automatic upgrade tool can't predict
-      # which keys might be set in maps assigned here, so it has
-      # produced a comprehensive set here. Consider simplifying
-      # this after confirming which keys can be set in practice.
-
       action          = lookup(ingress.value, "action", null)
       cidr_block      = lookup(ingress.value, "cidr_block", null)
       from_port       = lookup(ingress.value, "from_port", null)
