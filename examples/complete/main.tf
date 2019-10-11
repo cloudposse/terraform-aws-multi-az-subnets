@@ -1,3 +1,7 @@
+provider "aws" {
+  region = var.region
+}
+
 locals {
   public_cidr_block  = cidrsubnet(var.cidr_block, 1, 0)
   private_cidr_block = cidrsubnet(var.cidr_block, 1, 1)

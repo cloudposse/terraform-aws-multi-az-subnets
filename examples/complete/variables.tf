@@ -1,3 +1,7 @@
+variable "region" {
+  type = string
+}
+
 variable "namespace" {
   type        = string
   description = "Namespace (e.g. `cp` or `cloudposse`)"
