@@ -12,7 +12,8 @@ func getKeys(m map[string]string) []string {
   for k := range m {
     keys = append(keys, k)
   }
-  return sort.Strings(keys)
+  sort.Strings(keys)
+  return keys
 }
 
 // Test the Terraform module in examples/complete using Terratest.
