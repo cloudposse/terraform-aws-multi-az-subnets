@@ -3,7 +3,7 @@
 
 [![Cloud Posse][logo]](https://cpco.io/homepage)
 
-# terraform-aws-multi-az-subnets [![Build Status](https://travis-ci.org/cloudposse/terraform-aws-multi-az-subnets.svg?branch=master)](https://travis-ci.org/cloudposse/terraform-aws-multi-az-subnets) [![Latest Release](https://img.shields.io/github/release/cloudposse/terraform-aws-multi-az-subnets.svg)](https://github.com/cloudposse/terraform-aws-multi-az-subnets/releases/latest) [![Slack Community](https://slack.cloudposse.com/badge.svg)](https://slack.cloudposse.com)
+# terraform-aws-multi-az-subnets [![Codefresh build status](https://g.codefresh.io/api/badges/pipeline/cloudposse/terraform-modules%2Fterraform-aws-multi-az-subnets?type=cf-1)](https://g.codefresh.io/public/accounts/cloudposse/pipelines/5d2f6639a1d4a956082d61ac) [![Latest Release](https://img.shields.io/github/release/cloudposse/terraform-aws-multi-az-subnets.svg)](https://github.com/cloudposse/terraform-aws-multi-az-subnets/releases/latest) [![Slack Community](https://slack.cloudposse.com/badge.svg)](https://slack.cloudposse.com)
 
 
 Terraform module for multi-AZ [`subnets`](http://docs.aws.amazon.com/AmazonVPC/latest/UserGuide/VPC_Subnets.html) provisioning.
@@ -355,11 +355,13 @@ Check out [our other projects][github], [follow us on twitter][twitter], [apply 
 
 ### Contributors
 
-|  [![Andriy Knysh][aknysh_avatar]][aknysh_homepage]<br/>[Andriy Knysh][aknysh_homepage] |
-|---|
+|  [![Andriy Knysh][aknysh_avatar]][aknysh_homepage]<br/>[Andriy Knysh][aknysh_homepage] | [![Maxim Mironenko][maximmi_avatar]][maximmi_homepage]<br/>[Maxim Mironenko][maximmi_homepage] |
+|---|---|
 
   [aknysh_homepage]: https://github.com/aknysh
   [aknysh_avatar]: https://img.cloudposse.com/150x150/https://github.com/aknysh.png
+  [maximmi_homepage]: https://github.com/maximmi
+  [maximmi_avatar]: https://img.cloudposse.com/150x150/https://github.com/maximmi.png
 
 
 
