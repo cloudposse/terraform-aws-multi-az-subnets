@@ -3,7 +3,7 @@
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
 | attributes | Additional attributes (e.g. `policy` or `role`) | list(string) | `<list>` | no |
-| availability_zones | List of Availability Zones (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`) | list(string) | `<list>` | no |
+| availability_zones | List of Availability Zones (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`) | list(string) | - | yes |
 | az_ngw_ids | Only for private subnets. Map of AZ names to NAT Gateway IDs that are used as default routes when creating private subnets | map(string) | `<map>` | no |
 | cidr_block | Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`) | string | - | yes |
 | delimiter | Delimiter to be used between `namespace`, `stage`, `name` and `attributes` | string | `-` | no |

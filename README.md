@@ -73,7 +73,7 @@ module "public_subnets" {
   namespace           = var.namespace
   stage               = var.stage
   name                = var.name
-  availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  availability_zones  = ["us-east-2a", "us-east-2b", "us-east-2c"]
   vpc_id              = module.vpc.vpc_id
   cidr_block          = local.public_cidr_block
   type                = "public"
@@ -86,7 +86,7 @@ module "private_subnets" {
   namespace          = var.namespace
   stage              = var.stage
   name               = var.name
-  availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  availability_zones = ["us-east-2a", "us-east-2b", "us-east-2c"]
   vpc_id             = module.vpc.vpc_id
   cidr_block         = local.private_cidr_block
   type               = "private"
@@ -121,7 +121,7 @@ module "public_subnets" {
   namespace           = var.namespace
   stage               = var.stage
   name                = var.name
-  availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  availability_zones  = ["us-east-2a", "us-east-2b", "us-east-2c"]
   vpc_id              = module.vpc.vpc_id
   cidr_block          = local.public_cidr_block
   type                = "public"
@@ -134,7 +134,7 @@ module "private_subnets" {
   namespace           = var.namespace
   stage               = var.stage
   name                = var.name
-  availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  availability_zones  = ["us-east-2a", "us-east-2b", "us-east-2c"]
   vpc_id              = module.vpc.vpc_id
   cidr_block          = local.private_cidr_block
   type                = "private"
@@ -154,14 +154,14 @@ the output Maps of AZ names to subnet IDs look like these
 
 ```hcl
 public_az_subnet_ids = {
-  us-east-1a = subnet-ea58d78e
-  us-east-1b = subnet-556ee131
-  us-east-1c = subnet-6f54db0b
+  us-east-2a = subnet-ea58d78e
+  us-east-2b = subnet-556ee131
+  us-east-2c = subnet-6f54db0b
 }
 private_az_subnet_ids = {
-  us-east-1a = subnet-376de253
-  us-east-1b = subnet-9e53dcfa
-  us-east-1c = subnet-a86fe0cc
+  us-east-2a = subnet-376de253
+  us-east-2b = subnet-9e53dcfa
+  us-east-2c = subnet-a86fe0cc
 }
 ```
 
@@ -169,9 +169,9 @@ and the created subnet IDs could be found by the AZ names using `map["key"]` or 
 
 for example:
 
-`public_az_subnet_ids["us-east-1a"]`
+`public_az_subnet_ids["us-east-2a"]`
 
-`lookup(private_az_subnet_ids, "us-east-1b")`
+`lookup(private_az_subnet_ids, "us-east-2b")`
 <br/>
 
 
@@ -191,7 +191,7 @@ Available targets:
 | Name | Description | Type | Default | Required |
 |------|-------------|:----:|:-----:|:-----:|
 | attributes | Additional attributes (e.g. `policy` or `role`) | list(string) | `<list>` | no |
-| availability_zones | List of Availability Zones (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`) | list(string) | `<list>` | no |
+| availability_zones | List of Availability Zones (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`) | list(string) | - | yes |
 | az_ngw_ids | Only for private subnets. Map of AZ names to NAT Gateway IDs that are used as default routes when creating private subnets | map(string) | `<map>` | no |
 | cidr_block | Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`) | string | - | yes |
 | delimiter | Delimiter to be used between `namespace`, `stage`, `name` and `attributes` | string | `-` | no |

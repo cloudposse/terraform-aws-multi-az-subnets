@@ -4,7 +4,7 @@ locals {
 }
 
 module "vpc" {
-  source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=tags/0.7.0"
+  source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=tags/0.8.0"
   namespace  = var.namespace
   stage      = var.stage
   name       = var.name
@@ -21,7 +21,7 @@ module "public_subnets" {
   cidr_block          = local.public_cidr_block
   type                = "public"
   igw_id              = module.vpc.igw_id
-  nat_gateway_enabled = "true"
+  nat_gateway_enabled = true
 }
 
 module "private_subnets" {

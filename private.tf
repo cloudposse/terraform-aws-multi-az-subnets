@@ -31,7 +31,7 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_network_acl" "private" {
-  count      = var.enabled == "true" && var.type == "private" && signum(length(var.private_network_acl_id)) == 0 ? 1 : 0
+  count      = var.enabled && var.type == "private" && var.private_network_acl_id == "" ? 1 : 0
   vpc_id     = var.vpc_id
   subnet_ids = aws_subnet.private.*.id
   dynamic "egress" {
