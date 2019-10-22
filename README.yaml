@@ -38,9 +38,9 @@ github_repo: cloudposse/terraform-aws-multi-az-subnets
 
 # Badges to display
 badges:
-  - name: "Build Status"
-    image: "https://travis-ci.org/cloudposse/terraform-aws-multi-az-subnets.svg?branch=master"
-    url: "https://travis-ci.org/cloudposse/terraform-aws-multi-az-subnets"
+  - name: "Codefresh build status"
+    image: "https://g.codefresh.io/api/badges/pipeline/cloudposse/terraform-modules%2Fterraform-aws-multi-az-subnets?type=cf-1"
+    url: "https://g.codefresh.io/public/accounts/cloudposse/pipelines/5d2f6639a1d4a956082d61ac"
   - name: "Latest Release"
     image: "https://img.shields.io/github/release/cloudposse/terraform-aws-multi-az-subnets.svg"
     url: "https://github.com/cloudposse/terraform-aws-multi-az-subnets/releases/latest"
@@ -77,50 +77,43 @@ description: |-
 # How to use this project
 usage: |-
   ```hcl
-  module "vpc" {
-    source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=master"
-    namespace  = "${var.namespace}"
-    name       = "vpc"
-    stage      = "${var.stage}"
-    cidr_block = "${var.cidr_block}"
+  locals {
+    public_cidr_block  = cidrsubnet(var.cidr_block, 1, 0)
+    private_cidr_block = cidrsubnet(var.cidr_block, 1, 1)
   }
 
-  locals {
-    public_cidr_block  = "${cidrsubnet(module.vpc.vpc_cidr_block, 1, 0)}"
-    private_cidr_block = "${cidrsubnet(module.vpc.vpc_cidr_block, 1, 1)}"
+  module "vpc" {
+    source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=master"
+    namespace  = var.namespace
+    stage      = var.stage
+    name       = var.name
+    cidr_block = var.cidr_block
   }
 
   module "public_subnets" {
     source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
-    namespace           = "${var.namespace}"
-    stage               = "${var.stage}"
-    name                = "${var.name}"
-    availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
-    vpc_id              = "${module.vpc.vpc_id}"
-    cidr_block          = "${local.public_cidr_block}"
+    namespace           = var.namespace
+    stage               = var.stage
+    name                = var.name
+    availability_zones  = ["us-east-2a", "us-east-2b", "us-east-2c"]
+    vpc_id              = module.vpc.vpc_id
+    cidr_block          = local.public_cidr_block
     type                = "public"
-    igw_id              = "${module.vpc.igw_id}"
+    igw_id              = module.vpc.igw_id
     nat_gateway_enabled = "true"
   }
 
   module "private_subnets" {
-    source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
-    namespace           = "${var.namespace}"
-    stage               = "${var.stage}"
-    name                = "${var.name}"
-    availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
-    vpc_id              = "${module.vpc.vpc_id}"
-    cidr_block          = "${local.private_cidr_block}"
-    type                = "private"
+    source             = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
+    namespace          = var.namespace
+    stage              = var.stage
+    name               = var.name
+    availability_zones = ["us-east-2a", "us-east-2b", "us-east-2c"]
+    vpc_id             = module.vpc.vpc_id
+    cidr_block         = local.private_cidr_block
+    type               = "private"
 
-    # Map of AZ names to NAT Gateway IDs that was created in "public_subnets" module
-    az_ngw_ids          = "${module.public_subnets.az_ngw_ids}"
-
-    # Need to explicitly provide the count since Terraform currently can't use dynamic count on computed resources from different modules
-    # https://github.com/hashicorp/terraform/issues/10857
-    # https://github.com/hashicorp/terraform/issues/12125
-    # https://github.com/hashicorp/terraform/issues/4149
-    az_ngw_count = 3
+    az_ngw_ids = module.public_subnets.az_ngw_ids
   }
   ```
 examples: |-
@@ -129,49 +122,48 @@ examples: |-
   ```hcl
   module "vpc" {
     source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=master"
-    namespace  = "${var.namespace}"
+    namespace  = var.namespace
     name       = "vpc"
-    stage      = "${var.stage}"
-    cidr_block = "${var.cidr_block}"
+    stage      = var.stage
+    cidr_block = var.cidr_block
   }
 
   locals {
-    public_cidr_block  = "${cidrsubnet(module.vpc.vpc_cidr_block, 1, 0)}"
-    private_cidr_block = "${cidrsubnet(module.vpc.vpc_cidr_block, 1, 1)}"
+    public_cidr_block  = cidrsubnet(module.vpc.vpc_cidr_block, 1, 0)
+    private_cidr_block = cidrsubnet(module.vpc.vpc_cidr_block, 1, 1)
   }
 
   module "public_subnets" {
     source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
-    namespace           = "${var.namespace}"
-    stage               = "${var.stage}"
-    name                = "${var.name}"
-    availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
-    vpc_id              = "${module.vpc.vpc_id}"
-    cidr_block          = "${local.public_cidr_block}"
+    namespace           = var.namespace
+    stage               = var.stage
+    name                = var.name
+    availability_zones  = ["us-east-2a", "us-east-2b", "us-east-2c"]
+    vpc_id              = module.vpc.vpc_id
+    cidr_block          = local.public_cidr_block
     type                = "public"
-    igw_id              = "${module.vpc.igw_id}"
+    igw_id              = module.vpc.igw_id
     nat_gateway_enabled = "true"
   }
 
   module "private_subnets" {
     source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
-    namespace           = "${var.namespace}"
-    stage               = "${var.stage}"
-    name                = "${var.name}"
-    availability_zones  = ["us-east-1a", "us-east-1b", "us-east-1c"]
-    vpc_id              = "${module.vpc.vpc_id}"
-    cidr_block          = "${local.private_cidr_block}"
+    namespace           = var.namespace
+    stage               = var.stage
+    name                = var.name
+    availability_zones  = ["us-east-2a", "us-east-2b", "us-east-2c"]
+    vpc_id              = module.vpc.vpc_id
+    cidr_block          = local.private_cidr_block
     type                = "private"
-    az_ngw_ids          = "${module.public_subnets.az_ngw_ids}"
-    az_ngw_count        = 3
+    az_ngw_ids          = module.public_subnets.az_ngw_ids
   }
 
   output "private_az_subnet_ids" {
-    value = "${module.private_subnets.az_subnet_ids}"
+    value = module.private_subnets.az_subnet_ids
   }
 
   output "public_az_subnet_ids" {
-    value = "${module.public_subnets.az_subnet_ids}"
+    value = module.public_subnets.az_subnet_ids
   }
   ```
 
@@ -179,14 +171,14 @@ examples: |-
 
   ```hcl
   public_az_subnet_ids = {
-    us-east-1a = subnet-ea58d78e
-    us-east-1b = subnet-556ee131
-    us-east-1c = subnet-6f54db0b
+    us-east-2a = subnet-ea58d78e
+    us-east-2b = subnet-556ee131
+    us-east-2c = subnet-6f54db0b
   }
   private_az_subnet_ids = {
-    us-east-1a = subnet-376de253
-    us-east-1b = subnet-9e53dcfa
-    us-east-1c = subnet-a86fe0cc
+    us-east-2a = subnet-376de253
+    us-east-2b = subnet-9e53dcfa
+    us-east-2c = subnet-a86fe0cc
   }
   ```
 
@@ -194,9 +186,9 @@ examples: |-
 
   for example:
 
-  `public_az_subnet_ids["us-east-1a"]`
+  `public_az_subnet_ids["us-east-2a"]`
 
-  `lookup(private_az_subnet_ids, "us-east-1b")`
+  `lookup(private_az_subnet_ids, "us-east-2b")`
   <br/>
 
 screenshots:
@@ -212,3 +204,5 @@ include:
 contributors:
   - name: "Andriy Knysh"
     github: "aknysh"
+  - name: "Maxim Mironenko"
+    github: "maximmi"
