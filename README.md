@@ -213,7 +213,7 @@ Available targets:
 | Name | Version |
 |------|---------|
 | terraform | >= 0.12.0 |
-| aws | >= 2.0 |
+| aws | >= 2.0, < 4.0 |
 | local | >= 1.2 |
 | null | >= 2.0 |
 | template | >= 2.0 |
@@ -222,7 +222,7 @@ Available targets:
 
 | Name | Version |
 |------|---------|
-| aws | >= 2.0 |
+| aws | >= 2.0, < 4.0 |
 
 ## Inputs
 
