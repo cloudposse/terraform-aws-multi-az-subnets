@@ -1,17 +1,14 @@
 locals {
-  public_count              = var.enabled && var.type == "public" ? length(var.availability_zones) : 0
-  public_nat_gateways_count = var.enabled && var.type == "public" && var.nat_gateway_enabled ? length(var.availability_zones) : 0
+  public_count              = module.this.enabled && var.type == "public" ? length(var.availability_zones) : 0
+  public_nat_gateways_count = module.this.enabled && var.type == "public" && var.nat_gateway_enabled ? length(var.availability_zones) : 0
 }
 
 module "public_label" {
-  source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.17.0"
-  namespace  = var.namespace
-  name       = var.name
-  stage      = var.stage
-  delimiter  = var.delimiter
-  tags       = var.tags
-  attributes = compact(concat(var.attributes, ["public"]))
-  enabled    = var.enabled
+  source = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.22.0"
+
+  attributes = compact(concat(module.this.attributes, ["public"]))
+
+  context = module.this.context
 }
 
 resource "aws_subnet" "public" {
@@ -31,7 +28,7 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_network_acl" "public" {
-  count      = var.enabled && var.type == "public" && var.public_network_acl_id == "" ? 1 : 0
+  count      = module.this.enabled && var.type == "public" && var.public_network_acl_id == "" ? 1 : 0
   vpc_id     = var.vpc_id
   subnet_ids = aws_subnet.public.*.id
   dynamic "egress" {
@@ -155,4 +152,3 @@ locals {
     length(var.availability_zones),
   )
 }
-

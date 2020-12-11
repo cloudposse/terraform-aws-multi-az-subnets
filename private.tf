@@ -1,17 +1,14 @@
 locals {
-  private_count       = var.enabled == "true" && var.type == "private" ? length(var.availability_zones) : 0
+  private_count       = module.this.enabled == "true" && var.type == "private" ? length(var.availability_zones) : 0
   private_route_count = length(var.az_ngw_ids)
 }
 
 module "private_label" {
-  source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.17.0"
-  namespace  = var.namespace
-  name       = var.name
-  stage      = var.stage
-  delimiter  = var.delimiter
-  tags       = var.tags
-  attributes = compact(concat(var.attributes, ["private"]))
-  enabled    = var.enabled
+  source = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.22.0"
+
+  attributes = compact(concat(module.this.attributes, ["private"]))
+
+  context = module.this.context
 }
 
 resource "aws_subnet" "private" {
@@ -31,7 +28,7 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_network_acl" "private" {
-  count      = var.enabled && var.type == "private" && var.private_network_acl_id == "" ? 1 : 0
+  count      = module.this.enabled && var.type == "private" && var.private_network_acl_id == "" ? 1 : 0
   vpc_id     = var.vpc_id
   subnet_ids = aws_subnet.private.*.id
   dynamic "egress" {
@@ -104,4 +101,3 @@ resource "aws_route" "default" {
   destination_cidr_block = "0.0.0.0/0"
   depends_on             = [aws_route_table.private]
 }
-
