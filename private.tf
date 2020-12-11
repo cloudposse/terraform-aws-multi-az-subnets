@@ -1,5 +1,5 @@
 locals {
-  private_count       = module.this.enabled == "true" && var.type == "private" ? length(var.availability_zones) : 0
+  private_count       = module.this.enabled && var.type == "private" ? length(var.availability_zones) : 0
   private_route_count = length(var.az_ngw_ids)
 }
 
