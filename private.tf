@@ -20,7 +20,7 @@ resource "aws_subnet" "private" {
   tags = merge(
     module.private_label.tags,
     {
-      "Name" = "${module.private_label.id}${var.delimiter}${element(var.availability_zones, count.index)}"
+      "Name" = "${module.private_label.id}${module.this.delimiter}${element(var.availability_zones, count.index)}"
       "AZ"   = var.availability_zones[count.index]
       "Type" = var.type
     },
@@ -70,7 +70,7 @@ resource "aws_route_table" "private" {
   tags = merge(
     module.private_label.tags,
     {
-      "Name" = "${module.private_label.id}${var.delimiter}${element(var.availability_zones, count.index)}"
+      "Name" = "${module.private_label.id}${module.this.delimiter}${element(var.availability_zones, count.index)}"
       "AZ"   = element(var.availability_zones, count.index)
       "Type" = var.type
     },

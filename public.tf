@@ -20,7 +20,7 @@ resource "aws_subnet" "public" {
   tags = merge(
     module.public_label.tags,
     {
-      "Name" = "${module.public_label.id}${var.delimiter}${element(var.availability_zones, count.index)}"
+      "Name" = "${module.public_label.id}${module.this.delimiter}${element(var.availability_zones, count.index)}"
       "AZ"   = element(var.availability_zones, count.index)
       "Type" = var.type
     },
@@ -70,7 +70,7 @@ resource "aws_route_table" "public" {
   tags = merge(
     module.public_label.tags,
     {
-      "Name" = "${module.public_label.id}${var.delimiter}${element(var.availability_zones, count.index)}"
+      "Name" = "${module.public_label.id}${module.this.delimiter}${element(var.availability_zones, count.index)}"
       "AZ"   = element(var.availability_zones, count.index)
       "Type" = var.type
     },
@@ -117,7 +117,7 @@ resource "aws_nat_gateway" "public" {
   tags = merge(
     module.public_label.tags,
     {
-      "Name" = "${module.public_label.id}${var.delimiter}${element(var.availability_zones, count.index)}"
+      "Name" = "${module.public_label.id}${module.this.delimiter}${element(var.availability_zones, count.index)}"
       "AZ"   = element(var.availability_zones, count.index)
       "Type" = var.type
     },
