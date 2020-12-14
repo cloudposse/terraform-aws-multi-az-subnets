@@ -4,7 +4,8 @@ locals {
 }
 
 module "public_label" {
-  source = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.22.0"
+  source  = "cloudposse/label/null"
+  version = "0.22.0"
 
   attributes = compact(concat(module.this.attributes, ["public"]))
 
