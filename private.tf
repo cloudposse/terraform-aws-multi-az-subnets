@@ -107,4 +107,3 @@ resource "aws_route" "default" {
   destination_cidr_block = "0.0.0.0/0"
   depends_on             = [aws_route_table.private]
 }
-
