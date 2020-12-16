@@ -5,7 +5,7 @@ locals {
 
 module "private_label" {
   source  = "cloudposse/label/null"
-  version = "0.17.0"
+  version = "0.22.0"
 
   attributes = compact(concat(var.attributes, ["private"]))
 
@@ -107,4 +107,3 @@ resource "aws_route" "default" {
   destination_cidr_block = "0.0.0.0/0"
   depends_on             = [aws_route_table.private]
 }
-
