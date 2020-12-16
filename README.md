@@ -37,6 +37,8 @@ The public subnets are routed to the Internet Gateway specified by `var.igw_id`.
 
 The private subnets are routed to the NAT Gateways provided in the `var.az_ngw_ids` map.
 
+If you are creating subnets inside a VPC, consider using [cloudposse/terraform-aws-dynamic-subnets](https://github.com/cloudposse/terraform-aws-dynamic-subnets) instead.
+
 
 ---
 

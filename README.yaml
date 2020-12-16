@@ -62,6 +62,9 @@ description: |-
   `nat_gateway_enabled` flag controls the creation of NAT Gateways in the public subnets.
 
   The private subnets are routed to the NAT Gateways provided in the `var.az_ngw_ids` map.
+
+  If you are creating subnets inside a VPC, consider using [cloudposse/terraform-aws-dynamic-subnets](https://github.com/cloudposse/terraform-aws-dynamic-subnets) instead.
+
 # How to use this project
 usage: |-
   ```hcl

@@ -5,7 +5,7 @@ locals {
 
 module "private_label" {
   source  = "cloudposse/label/null"
-  version = "0.17.0"
+  version = "0.22.0"
 
   attributes = compact(concat(var.attributes, ["private"]))
 
