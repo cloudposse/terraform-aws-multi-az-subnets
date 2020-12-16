@@ -1,4 +1,6 @@
+<!-- markdownlint-disable -->
 # terraform-aws-multi-az-subnets [![Latest Release](https://img.shields.io/github/release/cloudposse/terraform-aws-multi-az-subnets.svg)](https://github.com/cloudposse/terraform-aws-multi-az-subnets/releases/latest) [![Slack Community](https://slack.cloudposse.com/badge.svg)](https://slack.cloudposse.com)
+<!-- markdownlint-restore -->
 
 [![README Header][readme_header_img]][readme_header_link]
 
@@ -47,6 +49,8 @@ This project is part of our comprehensive ["SweetOps"](https://cpco.io/sweetops)
 [<img align="right" title="Share on Twitter" src="https://docs.cloudposse.com/images/ionicons/social-twitter-outline-2.0.1-16x16-999999.svg" />][share_twitter]
 
 
+[![Terraform Open Source Modules](https://docs.cloudposse.com/images/terraform-open-source-modules.svg)][terraform_modules]
+
 
 
 It's 100% Open Source and licensed under the [APACHE2](LICENSE).
@@ -56,6 +60,8 @@ It's 100% Open Source and licensed under the [APACHE2](LICENSE).
 
 
 
+
+We literally have [*hundreds of terraform modules*][terraform_modules] that are Open Source and well-maintained. Check them out!
 
 
 
@@ -72,6 +78,16 @@ It's 100% Open Source and licensed under the [APACHE2](LICENSE).
 ## Usage
 
 
+**IMPORTANT:** We do not pin modules to versions in our examples because of the
+difficulty of keeping the versions in the documentation in sync with the latest released versions.
+We highly recommend that in your code you pin the version to the exact version you are
+using so that your infrastructure remains stable, and update versions in a
+systematic way so that they do not catch you by surprise.
+
+Also, because of a bug in the Terraform registry ([hashicorp/terraform#21417](https://github.com/hashicorp/terraform/issues/21417)),
+the registry shows many of our inputs as required when in fact they are optional.
+The table below correctly indicates which inputs are required.
+
 
 ```hcl
 locals {
@@ -80,7 +96,10 @@ locals {
 }
 
 module "vpc" {
-  source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=master"
+  source = "cloudposse/vpc/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version = "x.x.x"
+
   namespace  = var.namespace
   stage      = var.stage
   name       = var.name
@@ -88,7 +107,10 @@ module "vpc" {
 }
 
 module "public_subnets" {
-  source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
+  source = "cloudposse/multi-az-subnets/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version = "x.x.x"
+
   namespace           = var.namespace
   stage               = var.stage
   name                = var.name
@@ -101,7 +123,10 @@ module "public_subnets" {
 }
 
 module "private_subnets" {
-  source             = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
+  source = "cloudposse/multi-az-subnets/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version = "x.x.x"
+
   namespace          = var.namespace
   stage              = var.stage
   name               = var.name
@@ -123,7 +148,10 @@ Given the following configuration
 
 ```hcl
 module "vpc" {
-  source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=master"
+  source = "cloudposse/vpc/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version = "x.x.x"
+
   namespace  = var.namespace
   name       = "vpc"
   stage      = var.stage
@@ -136,7 +164,10 @@ locals {
 }
 
 module "public_subnets" {
-  source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
+  source = "cloudposse/multi-az-subnets/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version = "x.x.x"
+
   namespace           = var.namespace
   stage               = var.stage
   name                = var.name
@@ -149,7 +180,10 @@ module "public_subnets" {
 }
 
 module "private_subnets" {
-  source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
+  source = "cloudposse/multi-az-subnets/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version = "x.x.x"
+
   namespace           = var.namespace
   stage               = var.stage
   name                = var.name
@@ -212,7 +246,7 @@ Available targets:
 
 | Name | Version |
 |------|---------|
-| terraform | >= 0.12.0 |
+| terraform | >= 0.12.26 |
 | aws | >= 2.0 |
 | local | >= 1.2 |
 | null | >= 2.0 |
@@ -228,16 +262,21 @@ Available targets:
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| attributes | Additional attributes (e.g. `policy` or `role`) | `list(string)` | `[]` | no |
+| additional\_tag\_map | Additional tags for appending to tags\_as\_list\_of\_maps. Not added to `tags`. | `map(string)` | `{}` | no |
+| attributes | Additional attributes (e.g. `1`) | `list(string)` | `[]` | no |
 | availability\_zones | List of Availability Zones (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`) | `list(string)` | n/a | yes |
 | az\_ngw\_ids | Only for private subnets. Map of AZ names to NAT Gateway IDs that are used as default routes when creating private subnets | `map(string)` | `{}` | no |
 | cidr\_block | Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`) | `string` | n/a | yes |
-| delimiter | Delimiter to be used between `namespace`, `stage`, `name` and `attributes` | `string` | `"-"` | no |
-| enabled | Set to false to prevent the module from creating any resources | `string` | `"true"` | no |
+| context | Single object for setting entire context at once.<br>See description of individual variables for details.<br>Leave string and numeric variables as `null` to use default value.<br>Individual variable settings (non-null) override settings in context object,<br>except for attributes, tags, and additional\_tag\_map, which are merged. | <pre>object({<br>    enabled             = bool<br>    namespace           = string<br>    environment         = string<br>    stage               = string<br>    name                = string<br>    delimiter           = string<br>    attributes          = list(string)<br>    tags                = map(string)<br>    additional_tag_map  = map(string)<br>    regex_replace_chars = string<br>    label_order         = list(string)<br>    id_length_limit     = number<br>  })</pre> | <pre>{<br>  "additional_tag_map": {},<br>  "attributes": [],<br>  "delimiter": null,<br>  "enabled": true,<br>  "environment": null,<br>  "id_length_limit": null,<br>  "label_order": [],<br>  "name": null,<br>  "namespace": null,<br>  "regex_replace_chars": null,<br>  "stage": null,<br>  "tags": {}<br>}</pre> | no |
+| delimiter | Delimiter to be used between `namespace`, `environment`, `stage`, `name` and `attributes`.<br>Defaults to `-` (hyphen). Set to `""` to use no delimiter at all. | `string` | `null` | no |
+| enabled | Set to false to prevent the module from creating any resources | `bool` | `null` | no |
+| environment | Environment, e.g. 'uw2', 'us-west-2', OR 'prod', 'staging', 'dev', 'UAT' | `string` | `null` | no |
+| id\_length\_limit | Limit `id` to this many characters.<br>Set to `0` for unlimited length.<br>Set to `null` for default, which is `0`.<br>Does not affect `id_full`. | `number` | `null` | no |
 | igw\_id | Internet Gateway ID that is used as a default route when creating public subnets (e.g. `igw-9c26a123`) | `string` | `""` | no |
+| label\_order | The naming order of the id output and Name tag.<br>Defaults to ["namespace", "environment", "stage", "name", "attributes"].<br>You can omit any of the 5 elements, but at least one must be present. | `list(string)` | `null` | no |
 | max\_subnets | Maximum number of subnets that can be created. The variable is used for CIDR blocks calculation | `string` | `"6"` | no |
-| name | Application or solution name | `string` | n/a | yes |
-| namespace | Namespace (e.g. `cp` or `cloudposse`) | `string` | n/a | yes |
+| name | Solution name, e.g. 'app' or 'jenkins' | `string` | `null` | no |
+| namespace | Namespace, which could be your organization name or abbreviation, e.g. 'eg' or 'cp' | `string` | `null` | no |
 | nat\_gateway\_enabled | Flag to enable/disable NAT Gateways creation in public subnets | `string` | `"true"` | no |
 | private\_network\_acl\_egress | Egress network ACL rules | `list(map(string))` | <pre>[<br>  {<br>    "action": "allow",<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "protocol": "-1",<br>    "rule_no": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
 | private\_network\_acl\_id | Network ACL ID that is added to the private subnets. If empty, a new ACL will be created | `string` | `""` | no |
@@ -245,8 +284,9 @@ Available targets:
 | public\_network\_acl\_egress | Egress network ACL rules | `list(map(string))` | <pre>[<br>  {<br>    "action": "allow",<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "protocol": "-1",<br>    "rule_no": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
 | public\_network\_acl\_id | Network ACL ID that is added to the public subnets. If empty, a new ACL will be created | `string` | `""` | no |
 | public\_network\_acl\_ingress | Egress network ACL rules | `list(map(string))` | <pre>[<br>  {<br>    "action": "allow",<br>    "cidr_block": "0.0.0.0/0",<br>    "from_port": 0,<br>    "protocol": "-1",<br>    "rule_no": 100,<br>    "to_port": 0<br>  }<br>]</pre> | no |
-| stage | Stage (e.g. `prod`, `dev`, `staging`) | `string` | n/a | yes |
-| tags | Additional tags (e.g. map(`BusinessUnit`,`XYZ`) | `map(string)` | `{}` | no |
+| regex\_replace\_chars | Regex to replace chars with empty string in `namespace`, `environment`, `stage` and `name`.<br>If not set, `"/[^a-zA-Z0-9-]/"` is used to remove all characters other than hyphens, letters and digits. | `string` | `null` | no |
+| stage | Stage, e.g. 'prod', 'staging', 'dev', OR 'source', 'build', 'test', 'deploy', 'release' | `string` | `null` | no |
+| tags | Additional tags (e.g. `map('BusinessUnit','XYZ')` | `map(string)` | `{}` | no |
 | type | Type of subnets to create (`private` or `public`) | `string` | `"private"` | no |
 | vpc\_id | VPC ID | `string` | n/a | yes |
 
@@ -409,8 +449,10 @@ Check out [our other projects][github], [follow us on twitter][twitter], [apply 
 
 ### Contributors
 
+<!-- markdownlint-disable -->
 |  [![Andriy Knysh][aknysh_avatar]][aknysh_homepage]<br/>[Andriy Knysh][aknysh_homepage] | [![Maxim Mironenko][maximmi_avatar]][maximmi_homepage]<br/>[Maxim Mironenko][maximmi_homepage] |
 |---|---|
+<!-- markdownlint-restore -->
 
   [aknysh_homepage]: https://github.com/aknysh
   [aknysh_avatar]: https://img.cloudposse.com/150x150/https://github.com/aknysh.png

@@ -1,21 +1,20 @@
 locals {
-  private_count       = var.enabled == "true" && var.type == "private" ? length(var.availability_zones) : 0
+  private_count       = local.private_enabled ? length(var.availability_zones) : 0
   private_route_count = length(var.az_ngw_ids)
 }
 
 module "private_label" {
-  source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.17.0"
-  namespace  = var.namespace
-  name       = var.name
-  stage      = var.stage
-  delimiter  = var.delimiter
-  tags       = var.tags
+  source  = "cloudposse/label/null"
+  version = "0.17.0"
+
   attributes = compact(concat(var.attributes, ["private"]))
-  enabled    = var.enabled
+
+  context = module.this.context
 }
 
 resource "aws_subnet" "private" {
-  count             = local.private_count
+  count = local.private_count
+
   vpc_id            = var.vpc_id
   availability_zone = var.availability_zones[count.index]
   cidr_block        = cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), count.index)
@@ -23,7 +22,7 @@ resource "aws_subnet" "private" {
   tags = merge(
     module.private_label.tags,
     {
-      "Name" = "${module.private_label.id}${var.delimiter}${element(var.availability_zones, count.index)}"
+      "Name" = "${module.private_label.id}${module.this.delimiter}${element(var.availability_zones, count.index)}"
       "AZ"   = var.availability_zones[count.index]
       "Type" = var.type
     },
@@ -31,7 +30,8 @@ resource "aws_subnet" "private" {
 }
 
 resource "aws_network_acl" "private" {
-  count      = var.enabled && var.type == "private" && var.private_network_acl_id == "" ? 1 : 0
+  count = local.private_enabled && var.private_network_acl_id == "" ? 1 : 0
+
   vpc_id     = var.vpc_id
   subnet_ids = aws_subnet.private.*.id
   dynamic "egress" {
@@ -67,13 +67,14 @@ resource "aws_network_acl" "private" {
 }
 
 resource "aws_route_table" "private" {
-  count  = local.private_count
+  count = local.private_count
+
   vpc_id = var.vpc_id
 
   tags = merge(
     module.private_label.tags,
     {
-      "Name" = "${module.private_label.id}${var.delimiter}${element(var.availability_zones, count.index)}"
+      "Name" = "${module.private_label.id}${module.this.delimiter}${element(var.availability_zones, count.index)}"
       "AZ"   = element(var.availability_zones, count.index)
       "Type" = var.type
     },
@@ -81,7 +82,8 @@ resource "aws_route_table" "private" {
 }
 
 resource "aws_route_table_association" "private" {
-  count          = local.private_count
+  count = local.private_count
+
   subnet_id      = element(aws_subnet.private.*.id, count.index)
   route_table_id = element(aws_route_table.private.*.id, count.index)
   depends_on = [
@@ -92,6 +94,7 @@ resource "aws_route_table_association" "private" {
 
 resource "aws_route" "default" {
   count = local.private_route_count
+
   route_table_id = zipmap(
     var.availability_zones,
     matchkeys(
