@@ -1,36 +1,3 @@
-variable "namespace" {
-  description = "Namespace (e.g. `cp` or `cloudposse`)"
-  type        = string
-}
-
-variable "stage" {
-  description = "Stage (e.g. `prod`, `dev`, `staging`)"
-  type        = string
-}
-
-variable "name" {
-  type        = string
-  description = "Application or solution name"
-}
-
-variable "delimiter" {
-  type        = string
-  default     = "-"
-  description = "Delimiter to be used between `namespace`, `stage`, `name` and `attributes`"
-}
-
-variable "attributes" {
-  type        = list(string)
-  default     = []
-  description = "Additional attributes (e.g. `policy` or `role`)"
-}
-
-variable "tags" {
-  type        = map(string)
-  default     = {}
-  description = "Additional tags (e.g. map(`BusinessUnit`,`XYZ`)"
-}
-
 variable "availability_zones" {
   type        = list(string)
   description = "List of Availability Zones (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`)"
@@ -143,11 +110,6 @@ variable "private_network_acl_ingress" {
       protocol   = "-1"
     },
   ]
-}
-
-variable "enabled" {
-  description = "Set to false to prevent the module from creating any resources"
-  default     = "true"
 }
 
 variable "nat_gateway_enabled" {

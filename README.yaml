@@ -62,6 +62,9 @@ description: |-
   `nat_gateway_enabled` flag controls the creation of NAT Gateways in the public subnets.
 
   The private subnets are routed to the NAT Gateways provided in the `var.az_ngw_ids` map.
+
+  If you are creating subnets inside a VPC, consider using [cloudposse/terraform-aws-dynamic-subnets](https://github.com/cloudposse/terraform-aws-dynamic-subnets) instead.
+
 # How to use this project
 usage: |-
   ```hcl
@@ -71,7 +74,10 @@ usage: |-
   }
 
   module "vpc" {
-    source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=master"
+    source = "cloudposse/vpc/aws"
+    # Cloud Posse recommends pinning every module to a specific version
+    # version = "x.x.x"
+
     namespace  = var.namespace
     stage      = var.stage
     name       = var.name
@@ -79,7 +85,10 @@ usage: |-
   }
 
   module "public_subnets" {
-    source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
+    source = "cloudposse/multi-az-subnets/aws"
+    # Cloud Posse recommends pinning every module to a specific version
+    # version = "x.x.x"
+
     namespace           = var.namespace
     stage               = var.stage
     name                = var.name
@@ -92,7 +101,10 @@ usage: |-
   }
 
   module "private_subnets" {
-    source             = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
+    source = "cloudposse/multi-az-subnets/aws"
+    # Cloud Posse recommends pinning every module to a specific version
+    # version = "x.x.x"
+
     namespace          = var.namespace
     stage              = var.stage
     name               = var.name
@@ -109,7 +121,10 @@ examples: |-
 
   ```hcl
   module "vpc" {
-    source     = "git::https://github.com/cloudposse/terraform-aws-vpc.git?ref=master"
+    source = "cloudposse/vpc/aws"
+    # Cloud Posse recommends pinning every module to a specific version
+    # version = "x.x.x"
+
     namespace  = var.namespace
     name       = "vpc"
     stage      = var.stage
@@ -122,7 +137,10 @@ examples: |-
   }
 
   module "public_subnets" {
-    source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
+    source = "cloudposse/multi-az-subnets/aws"
+    # Cloud Posse recommends pinning every module to a specific version
+    # version = "x.x.x"
+
     namespace           = var.namespace
     stage               = var.stage
     name                = var.name
@@ -135,7 +153,10 @@ examples: |-
   }
 
   module "private_subnets" {
-    source              = "git::https://github.com/cloudposse/terraform-aws-multi-az-subnets.git?ref=master"
+    source = "cloudposse/multi-az-subnets/aws"
+    # Cloud Posse recommends pinning every module to a specific version
+    # version = "x.x.x"
+
     namespace           = var.namespace
     stage               = var.stage
     name                = var.name

@@ -1,21 +1,20 @@
 locals {
-  public_count              = var.enabled && var.type == "public" ? length(var.availability_zones) : 0
-  public_nat_gateways_count = var.enabled && var.type == "public" && var.nat_gateway_enabled ? length(var.availability_zones) : 0
+  public_count              = local.public_enabled ? length(var.availability_zones) : 0
+  public_nat_gateways_count = local.public_enabled && var.nat_gateway_enabled ? length(var.availability_zones) : 0
 }
 
 module "public_label" {
-  source     = "git::https://github.com/cloudposse/terraform-null-label.git?ref=tags/0.17.0"
-  namespace  = var.namespace
-  name       = var.name
-  stage      = var.stage
-  delimiter  = var.delimiter
-  tags       = var.tags
+  source  = "cloudposse/label/null"
+  version = "0.22.0"
+
   attributes = compact(concat(var.attributes, ["public"]))
-  enabled    = var.enabled
+
+  context = module.this.context
 }
 
 resource "aws_subnet" "public" {
-  count             = local.public_count
+  count = local.public_count
+
   vpc_id            = var.vpc_id
   availability_zone = element(var.availability_zones, count.index)
   cidr_block        = cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), count.index)
@@ -23,7 +22,7 @@ resource "aws_subnet" "public" {
   tags = merge(
     module.public_label.tags,
     {
-      "Name" = "${module.public_label.id}${var.delimiter}${element(var.availability_zones, count.index)}"
+      "Name" = "${module.public_label.id}${module.this.delimiter}${element(var.availability_zones, count.index)}"
       "AZ"   = element(var.availability_zones, count.index)
       "Type" = var.type
     },
@@ -31,7 +30,8 @@ resource "aws_subnet" "public" {
 }
 
 resource "aws_network_acl" "public" {
-  count      = var.enabled && var.type == "public" && var.public_network_acl_id == "" ? 1 : 0
+  count = local.public_enabled && var.public_network_acl_id == "" ? 1 : 0
+
   vpc_id     = var.vpc_id
   subnet_ids = aws_subnet.public.*.id
   dynamic "egress" {
@@ -73,7 +73,7 @@ resource "aws_route_table" "public" {
   tags = merge(
     module.public_label.tags,
     {
-      "Name" = "${module.public_label.id}${var.delimiter}${element(var.availability_zones, count.index)}"
+      "Name" = "${module.public_label.id}${module.this.delimiter}${element(var.availability_zones, count.index)}"
       "AZ"   = element(var.availability_zones, count.index)
       "Type" = var.type
     },
@@ -120,7 +120,7 @@ resource "aws_nat_gateway" "public" {
   tags = merge(
     module.public_label.tags,
     {
-      "Name" = "${module.public_label.id}${var.delimiter}${element(var.availability_zones, count.index)}"
+      "Name" = "${module.public_label.id}${module.this.delimiter}${element(var.availability_zones, count.index)}"
       "AZ"   = element(var.availability_zones, count.index)
       "Type" = var.type
     },
