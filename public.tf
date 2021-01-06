@@ -15,9 +15,10 @@ module "public_label" {
 resource "aws_subnet" "public" {
   count = local.public_count
 
-  vpc_id            = var.vpc_id
-  availability_zone = element(var.availability_zones, count.index)
-  cidr_block        = cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), count.index)
+  vpc_id                  = var.vpc_id
+  availability_zone       = element(var.availability_zones, count.index)
+  cidr_block              = cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), count.index)
+  map_public_ip_on_launch = var.assign_public_ip_on_launch
 
   tags = merge(
     module.public_label.tags,
