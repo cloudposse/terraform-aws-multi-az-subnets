@@ -138,7 +138,7 @@ module "public_subnets" {
   cidr_block          = local.public_cidr_block
   type                = "public"
   igw_id              = module.vpc.igw_id
-  nat_gateway_enabled = true
+  nat_gateway_enabled = "true"
 }
 
 module "private_subnets" {
@@ -195,7 +195,7 @@ module "public_subnets" {
   cidr_block          = local.public_cidr_block
   type                = "public"
   igw_id              = module.vpc.igw_id
-  nat_gateway_enabled = true
+  nat_gateway_enabled = "true"
 }
 
 module "private_subnets" {
