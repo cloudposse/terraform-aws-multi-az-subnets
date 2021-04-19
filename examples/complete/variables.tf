@@ -12,3 +12,8 @@ variable "availability_zones" {
   type        = list(string)
   description = "List of Availability Zones (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`)"
 }
+
+variable "nat_gateway_enabled" {
+  type        = bool
+  description = "Flag to enable/disable NAT Gateways creation in public subnets"
+}

@@ -15,10 +15,7 @@ output "az_route_table_ids" {
 }
 
 output "az_ngw_ids" {
-  value = zipmap(
-    var.availability_zones,
-    coalescelist(aws_nat_gateway.public.*.id, local.dummy_az_ngw_ids),
-  )
+  value       = local.nat_gw_availability_zones_map
   description = "Map of AZ names to NAT Gateway IDs (only for public subnets)"
 }
 

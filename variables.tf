@@ -113,7 +113,8 @@ variable "private_network_acl_ingress" {
 }
 
 variable "nat_gateway_enabled" {
+  type        = bool
   description = "Flag to enable/disable NAT Gateways creation in public subnets"
-  default     = "true"
+  default     = true
 }
 

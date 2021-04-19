@@ -127,32 +127,9 @@ resource "aws_nat_gateway" "public" {
   )
 }
 
-# Dummy list of NAT Gateway IDs to use in the outputs for private subnets and when `nat_gateway_enabled=false` for public subnets
-# Needed due to Terraform limitation of not allowing using conditionals with maps and lists
 locals {
-  dummy_az_ngw_ids = slice(
-    [
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-    ],
-    0,
-    length(var.availability_zones),
-  )
+  # Ensure zipmap has same number of elements
+  nat_gw_availability_zones     = slice(var.availability_zones, 0, local.public_nat_gateways_count)
+  nat_gw_availability_zones_map = zipmap(local.nat_gw_availability_zones, aws_nat_gateway.public.*.id)
 }
 

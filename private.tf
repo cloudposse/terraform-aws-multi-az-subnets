@@ -1,6 +1,6 @@
 locals {
-  private_count       = local.private_enabled ? length(var.availability_zones) : 0
-  private_route_count = length(var.az_ngw_ids)
+  private_count            = local.private_enabled ? length(var.availability_zones) : 0
+  nat_gateways_route_count = var.nat_gateway_enabled ? length(var.az_ngw_ids) : 0
 }
 
 module "private_label" {
@@ -93,7 +93,7 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_route" "default" {
-  count = local.private_route_count
+  count = local.nat_gateways_route_count
 
   route_table_id = zipmap(
     var.availability_zones,
