@@ -1,6 +1,6 @@
 locals {
-  public_count              = local.public_enabled ? length(var.availability_zones) : 0
-  public_nat_gateways_count = local.public_enabled && var.nat_gateway_enabled ? length(var.availability_zones) : 0
+  public_count              = local.public_enabled ? length(local.availability_zones) : 0
+  public_nat_gateways_count = local.public_enabled && var.nat_gateway_enabled ? length(local.availability_zones) : 0
 }
 
 module "public_label" {
@@ -16,14 +16,14 @@ resource "aws_subnet" "public" {
   count = local.public_count
 
   vpc_id            = var.vpc_id
-  availability_zone = element(var.availability_zones, count.index)
+  availability_zone = element(local.availability_zones, count.index)
   cidr_block        = cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), count.index)
 
   tags = merge(
     module.public_label.tags,
     {
       "Name" = "${module.public_label.id}${module.this.delimiter}${element(var.availability_zones, count.index)}"
-      "AZ"   = element(var.availability_zones, count.index)
+      "AZ"   = element(local.availability_zones, count.index)
       "Type" = var.type
     },
   )
@@ -74,7 +74,7 @@ resource "aws_route_table" "public" {
     module.public_label.tags,
     {
       "Name" = "${module.public_label.id}${module.this.delimiter}${element(var.availability_zones, count.index)}"
-      "AZ"   = element(var.availability_zones, count.index)
+      "AZ"   = element(local.availability_zones, count.index)
       "Type" = var.type
     },
   )
@@ -121,38 +121,27 @@ resource "aws_nat_gateway" "public" {
     module.public_label.tags,
     {
       "Name" = "${module.public_label.id}${module.this.delimiter}${element(var.availability_zones, count.index)}"
-      "AZ"   = element(var.availability_zones, count.index)
+      "AZ"   = element(local.availability_zones, count.index)
       "Type" = var.type
     },
   )
 }
 
-# Dummy list of NAT Gateway IDs to use in the outputs for private subnets and when `nat_gateway_enabled=false` for public subnets
-# Needed due to Terraform limitation of not allowing using conditionals with maps and lists
 locals {
-  dummy_az_ngw_ids = slice(
-    [
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-      "0",
-    ],
-    0,
-    length(var.availability_zones),
-  )
+  public_az_subnets = tolist([for subnet in aws_subnet.public[*] : {
+    availability_zone = subnet.tags.AZ
+    subnet            = subnet
+    subnet_id         = subnet.id
+    subnet_arn        = subnet.arn
+  }])
+  public_az_route_table_ids = tolist([for route_table in aws_route_table.public[*] : {
+    availability_zone = route_table.tags.AZ
+    route_table       = route_table
+    route_table_id    = route_table.id
+  }])
+  public_az_ngw_ids = tolist([for nat_gateway in aws_nat_gateway.public[*] : {
+    availability_zone = nat_gateway.tags.AZ
+    nat_gateway_id    = nat_gateway.id
+  }])
 }
 

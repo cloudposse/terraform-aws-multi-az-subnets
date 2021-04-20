@@ -16,14 +16,14 @@ resource "aws_subnet" "private" {
   count = local.private_count
 
   vpc_id            = var.vpc_id
-  availability_zone = var.availability_zones[count.index]
+  availability_zone = local.availability_zones[count.index]
   cidr_block        = cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), count.index)
 
   tags = merge(
     module.private_label.tags,
     {
       "Name" = "${module.private_label.id}${module.this.delimiter}${element(var.availability_zones, count.index)}"
-      "AZ"   = var.availability_zones[count.index]
+      "AZ"   = local.availability_zones[count.index]
       "Type" = var.type
     },
   )
@@ -75,7 +75,7 @@ resource "aws_route_table" "private" {
     module.private_label.tags,
     {
       "Name" = "${module.private_label.id}${module.this.delimiter}${element(var.availability_zones, count.index)}"
-      "AZ"   = element(var.availability_zones, count.index)
+      "AZ"   = element(local.availability_zones, count.index)
       "Type" = var.type
     },
   )
@@ -96,14 +96,30 @@ resource "aws_route" "default" {
   count = local.private_route_count
 
   route_table_id = zipmap(
-    var.availability_zones,
+    local.availability_zones,
     matchkeys(
       aws_route_table.private.*.id,
       aws_route_table.private.*.tags.AZ,
-      var.availability_zones,
+      local.availability_zones,
     ),
   )[element(keys(var.az_ngw_ids), count.index)]
   nat_gateway_id         = var.az_ngw_ids[element(keys(var.az_ngw_ids), count.index)]
   destination_cidr_block = "0.0.0.0/0"
   depends_on             = [aws_route_table.private]
+}
+
+locals {
+  private_az_subnets = tolist([for subnet in aws_subnet.private[*] : {
+    availability_zone = subnet.tags.AZ
+    subnet            = subnet
+    subnet_id         = subnet.id
+    subnet_arn        = subnet.arn
+  }])
+  private_az_route_table_ids = tolist([for route_table in aws_route_table.private[*] : {
+    availability_zone = route_table.tags.AZ
+    route_table       = route_table
+    route_table_id    = route_table.id
+  }])
+  # NAT gateways not present in private subnets
+  private_az_ngw_ids = tolist([])
 }
