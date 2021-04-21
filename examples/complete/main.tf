@@ -41,6 +41,4 @@ module "private_subnets" {
   az_ngw_ids = module.public_subnets.az_ngw_ids
 
   context = module.this.context
-
-  depends_on = [module.public_subnets]
 }
