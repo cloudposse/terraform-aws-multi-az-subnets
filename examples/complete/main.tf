@@ -25,7 +25,7 @@ module "public_subnets" {
   cidr_block          = local.public_cidr_block
   type                = "public"
   igw_id              = module.vpc.igw_id
-  nat_gateway_enabled = true
+  nat_gateway_enabled = var.nat_gateway_enabled
 
   context = module.this.context
 }

@@ -32,7 +32,7 @@ func TestExamplesComplete(t *testing.T) {
 		TerraformDir: "../../examples/complete",
 		Upgrade:      true,
 		// Variables to pass to our Terraform code using -var-file options
-		VarFiles: []string{"fixtures.us-east-2.tfvars"},
+		VarFiles: []string{"fixtures.us-east-2.tfvars", "fixtures.nat_gw_enabled.tfvars"},
 	}
 
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created
@@ -127,4 +127,33 @@ func TestExamplesCompleteDisabledModule(t *testing.T) {
 	assert.Empty(t, publicNATGateWayIds)
 	assert.Empty(t, publicSubnetIds)
 	assert.Empty(t, publicRouteTableIds)
+}
+
+func TestExamplesCompleteNoNatGateway(t *testing.T) {
+	// Init phase module download fails when run in parallel
+	//t.Parallel()
+
+	terraformOptions := &terraform.Options{
+		// The path to where our Terraform code is located
+		TerraformDir: "../../examples/complete",
+		Upgrade:      true,
+		// Variables to pass to our Terraform code using -var-file options
+		VarFiles: []string{"fixtures.us-east-2.tfvars", "fixtures.nat_gw_disabled.tfvars"},
+	}
+
+	// At the end of the test, run `terraform destroy` to clean up any resources that were created
+	defer terraform.Destroy(t, terraformOptions)
+
+	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
+	terraform.InitAndApply(t, terraformOptions)
+
+	privateRouteTableIds := terraform.OutputMap(t, terraformOptions, "private_az_route_table_ids")
+	publicNATGateWayIds := terraform.OutputMap(t, terraformOptions, "public_az_ngw_ids")
+	privateNATGateWayIds := terraform.OutputMap(t, terraformOptions, "private_az_ngw_ids")
+
+	expectedAZs := []string{"us-east-2a", "us-east-2b", "us-east-2c"}
+	assert.Equal(t, expectedAZs, getKeys(privateRouteTableIds))
+	assertValueStartsWith(t, privateRouteTableIds, "^rtb-.*")
+	assert.Empty(t, publicNATGateWayIds)
+	assert.Empty(t, privateNATGateWayIds)
 }
