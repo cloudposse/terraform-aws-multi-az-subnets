@@ -1,5 +1,6 @@
 locals {
   private_azs = local.private_enabled ? { for idx, az in var.availability_zones : az => idx } : {}
+  az_ngw_ids  = local.nat_gateway_enabled ? { for az, ngw_id in var.az_ngw_ids : az => ngw_id if ngw_id != null } : {}
 }
 
 module "private_label" {
@@ -90,10 +91,10 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_route" "default" {
-  for_each = local.private_azs
+  for_each = local.az_ngw_ids
 
   route_table_id         = aws_route_table.private[each.key].id
-  nat_gateway_id         = var.az_ngw_ids[each.key]
+  nat_gateway_id         = each.value
   destination_cidr_block = "0.0.0.0/0"
   depends_on             = [aws_route_table.private]
 }
