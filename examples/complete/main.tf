@@ -9,7 +9,7 @@ locals {
 
 module "vpc" {
   source  = "cloudposse/vpc/aws"
-  version = "0.18.1"
+  version = "0.21.1"
 
   cidr_block = var.cidr_block
 
@@ -19,6 +19,7 @@ module "vpc" {
 module "public_subnets" {
   source = "../../"
 
+  enabled             = var.enabled
   availability_zones  = var.availability_zones
   vpc_id              = module.vpc.vpc_id
   cidr_block          = local.public_cidr_block
@@ -32,6 +33,7 @@ module "public_subnets" {
 module "private_subnets" {
   source = "../../"
 
+  enabled            = var.enabled
   availability_zones = var.availability_zones
   vpc_id             = module.vpc.vpc_id
   cidr_block         = local.private_cidr_block
