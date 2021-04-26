@@ -9,7 +9,7 @@ locals {
 
 module "vpc" {
   source  = "cloudposse/vpc/aws"
-  version = "0.18.1"
+  version = "0.21.1"
 
   cidr_block = var.cidr_block
 
