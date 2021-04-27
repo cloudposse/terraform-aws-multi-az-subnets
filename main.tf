@@ -14,7 +14,7 @@ locals {
   }
   # Only relevant for public subnets. Output is empty map for private subnets or when nat gateway is disabled
   output_ngw_id = { for az in(local.public_enabled && local.nat_gateway_enabled ? var.availability_zones : []) : az => {
-    ngw_id         = local.public_enabled ? try(aws_nat_gateway.public[az].id, null) : null
+    ngw_id = local.public_enabled ? try(aws_nat_gateway.public[az].id, null) : null
     }
   }
 }
