@@ -1,6 +1,6 @@
 locals {
   private_azs = local.private_enabled ? { for idx, az in var.availability_zones : az => idx } : {}
-  az_ngw_ids  = local.nat_gateway_enabled ? { for az, ngw_id in var.az_ngw_ids : az => ngw_id if ngw_id != null } : {}
+  az_ngw_ids  = local.nat_gateway_enabled ? var.az_ngw_ids : {}
 }
 
 module "private_label" {

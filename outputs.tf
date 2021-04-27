@@ -15,7 +15,7 @@ output "az_route_table_ids" {
 
 output "az_ngw_ids" {
   # No ellipsis needed since this module makes either public or private subnets. See the TF 0.15 one function
-  value       = { for az, m in local.output_map : az => m.ngw_id }
+  value       = { for az, m in local.output_ngw_id : az => m.ngw_id }
   description = "Map of AZ names to NAT Gateway IDs (only for public subnets)"
 }
 

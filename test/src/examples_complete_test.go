@@ -105,7 +105,7 @@ func TestExamplesCompleteDisabledModule(t *testing.T) {
 		TerraformDir: "../../examples/complete",
 		Upgrade:      true,
 		// Variables to pass to our Terraform code using -var-file options
-		VarFiles: []string{"fixtures.us-east-2.tfvars", "fixtures.disabled.tfvars"},
+		VarFiles: []string{"fixtures.us-east-2.tfvars", "fixtures.nat_gw_enabled.tfvars", "fixtures.disabled.tfvars"},
 	}
 
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created
