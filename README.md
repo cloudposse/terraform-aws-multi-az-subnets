@@ -1,3 +1,4 @@
+
 <!-- markdownlint-disable -->
 # terraform-aws-multi-az-subnets [![Latest Release](https://img.shields.io/github/release/cloudposse/terraform-aws-multi-az-subnets.svg)](https://github.com/cloudposse/terraform-aws-multi-az-subnets/releases/latest) [![Slack Community](https://slack.cloudposse.com/badge.svg)](https://slack.cloudposse.com)
 <!-- markdownlint-restore -->
@@ -39,7 +40,6 @@ The private subnets are routed to the NAT Gateways provided in the `var.az_ngw_i
 
 If you are creating subnets inside a VPC, consider using [cloudposse/terraform-aws-dynamic-subnets](https://github.com/cloudposse/terraform-aws-dynamic-subnets) instead.
 
-
 ---
 
 This project is part of our comprehensive ["SweetOps"](https://cpco.io/sweetops) approach towards DevOps.
@@ -64,8 +64,6 @@ It's 100% Open Source and licensed under the [APACHE2](LICENSE).
 
 
 We literally have [*hundreds of terraform modules*][terraform_modules] that are Open Source and well-maintained. Check them out!
-
-
 
 
 
@@ -268,23 +266,22 @@ Available targets:
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 0.13.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 2.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 3.0 |
 | <a name="requirement_local"></a> [local](#requirement\_local) | >= 1.2 |
 | <a name="requirement_null"></a> [null](#requirement\_null) | >= 2.0 |
-| <a name="requirement_template"></a> [template](#requirement\_template) | >= 2.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 2.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 3.0 |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_private_label"></a> [private\_label](#module\_private\_label) | cloudposse/label/null | 0.22.1 |
-| <a name="module_public_label"></a> [public\_label](#module\_public\_label) | cloudposse/label/null | 0.22.1 |
+| <a name="module_private_label"></a> [private\_label](#module\_private\_label) | cloudposse/label/null | 0.24.1 |
+| <a name="module_public_label"></a> [public\_label](#module\_public\_label) | cloudposse/label/null | 0.24.1 |
 | <a name="module_this"></a> [this](#module\_this) | cloudposse/label/null | 0.24.1 |
 
 ## Resources
@@ -347,6 +344,7 @@ Available targets:
 | <a name="output_az_route_table_ids"></a> [az\_route\_table\_ids](#output\_az\_route\_table\_ids) | Map of AZ names to Route Table IDs |
 | <a name="output_az_subnet_arns"></a> [az\_subnet\_arns](#output\_az\_subnet\_arns) | Map of AZ names to subnet ARNs |
 | <a name="output_az_subnet_ids"></a> [az\_subnet\_ids](#output\_az\_subnet\_ids) | Map of AZ names to subnet IDs |
+| <a name="output_az_subnet_map"></a> [az\_subnet\_map](#output\_az\_subnet\_map) | Map of AZ names to map of information about subnets |
 <!-- markdownlint-restore -->
 
 

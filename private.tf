@@ -1,29 +1,27 @@
 locals {
-  private_count       = local.private_enabled ? length(var.availability_zones) : 0
-  private_route_count = length(var.az_ngw_ids)
+  private_azs = local.private_enabled ? { for idx, az in var.availability_zones : az => idx } : {}
 }
 
 module "private_label" {
   source  = "cloudposse/label/null"
-  version = "0.22.1"
+  version = "0.24.1"
 
-  attributes = compact(concat(var.attributes, ["private"]))
+  attributes = ["private"]
 
   context = module.this.context
 }
 
 resource "aws_subnet" "private" {
-  count = local.private_count
+  for_each = local.private_azs
 
   vpc_id            = var.vpc_id
-  availability_zone = var.availability_zones[count.index]
-  cidr_block        = cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), count.index)
+  availability_zone = each.key
+  cidr_block        = cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), each.value)
 
   tags = merge(
     module.private_label.tags,
     {
-      "Name" = "${module.private_label.id}${module.this.delimiter}${element(var.availability_zones, count.index)}"
-      "AZ"   = var.availability_zones[count.index]
+      "Name" = "${module.private_label.id}${module.this.delimiter}${each.key}"
       "Type" = var.type
     },
   )
@@ -33,7 +31,7 @@ resource "aws_network_acl" "private" {
   count = local.private_enabled && var.private_network_acl_id == "" ? 1 : 0
 
   vpc_id     = var.vpc_id
-  subnet_ids = aws_subnet.private.*.id
+  subnet_ids = values(aws_subnet.private)[*].id
   dynamic "egress" {
     for_each = var.private_network_acl_egress
     content {
@@ -67,25 +65,24 @@ resource "aws_network_acl" "private" {
 }
 
 resource "aws_route_table" "private" {
-  count = local.private_count
+  for_each = local.private_azs
 
   vpc_id = var.vpc_id
 
   tags = merge(
     module.private_label.tags,
     {
-      "Name" = "${module.private_label.id}${module.this.delimiter}${element(var.availability_zones, count.index)}"
-      "AZ"   = element(var.availability_zones, count.index)
+      "Name" = "${module.private_label.id}${module.this.delimiter}${each.key}"
       "Type" = var.type
     },
   )
 }
 
 resource "aws_route_table_association" "private" {
-  count = local.private_count
+  for_each = local.private_azs
 
-  subnet_id      = element(aws_subnet.private.*.id, count.index)
-  route_table_id = element(aws_route_table.private.*.id, count.index)
+  subnet_id      = aws_subnet.private[each.key].id
+  route_table_id = aws_route_table.private[each.key].id
   depends_on = [
     aws_subnet.private,
     aws_route_table.private,
@@ -93,17 +90,10 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_route" "default" {
-  count = local.private_route_count
+  for_each = local.private_azs
 
-  route_table_id = zipmap(
-    var.availability_zones,
-    matchkeys(
-      aws_route_table.private.*.id,
-      aws_route_table.private.*.tags.AZ,
-      var.availability_zones,
-    ),
-  )[element(keys(var.az_ngw_ids), count.index)]
-  nat_gateway_id         = var.az_ngw_ids[element(keys(var.az_ngw_ids), count.index)]
+  route_table_id         = aws_route_table.private[each.key].id
+  nat_gateway_id         = var.az_ngw_ids[each.key]
   destination_cidr_block = "0.0.0.0/0"
   depends_on             = [aws_route_table.private]
 }
