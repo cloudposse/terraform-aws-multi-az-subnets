@@ -24,6 +24,7 @@ resource "aws_subnet" "public" {
   ipv6_cidr_block = local.public_ipv6_enabled ? cidrsubnet(var.ipv6_cidr_block, (
     local.public_ipv6_target_mask - tonumber(split("/", var.ipv6_cidr_block)[1])
   ), each.value) : null
+  map_public_ip_on_launch = var.assign_public_ip_on_launch
 
   tags = merge(
     module.public_label.tags,
