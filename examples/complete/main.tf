@@ -3,8 +3,9 @@ provider "aws" {
 }
 
 locals {
-  public_cidr_block  = cidrsubnet(var.cidr_block, 1, 0)
-  private_cidr_block = cidrsubnet(var.cidr_block, 1, 1)
+  public_cidr_block      = cidrsubnet(var.cidr_block, 2, 0)
+  public_only_cidr_block = cidrsubnet(var.cidr_block, 2, 1)
+  private_cidr_block     = cidrsubnet(var.cidr_block, 2, 2)
 }
 
 module "vpc" {
@@ -26,6 +27,20 @@ module "public_subnets" {
   type                = "public"
   igw_id              = module.vpc.igw_id
   nat_gateway_enabled = true
+
+  context = module.this.context
+}
+
+module "public_only_subnets" {
+  source = "../../"
+
+  enabled             = var.enabled
+  availability_zones  = var.availability_zones
+  vpc_id              = module.vpc.vpc_id
+  cidr_block          = local.public_only_cidr_block
+  type                = "public"
+  igw_id              = module.vpc.igw_id
+  nat_gateway_enabled = false
 
   context = module.this.context
 }

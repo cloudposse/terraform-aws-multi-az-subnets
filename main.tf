@@ -9,7 +9,7 @@ locals {
     subnet_id      = local.public_enabled ? aws_subnet.public[az].id : aws_subnet.private[az].id
     subnet_arn     = local.public_enabled ? aws_subnet.public[az].arn : aws_subnet.private[az].arn
     route_table_id = local.public_enabled ? aws_route_table.public[az].id : aws_route_table.private[az].id
-    ngw_id         = local.public_enabled ? aws_nat_gateway.public[az].id : null
+    ngw_id         = local.public_enabled && var.nat_gateway_enabled ? aws_nat_gateway.public[az].id : null
     }
   }
 }
