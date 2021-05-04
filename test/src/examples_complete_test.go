@@ -16,6 +16,17 @@ func getKeys(m map[string]string) []string {
 	return keys
 }
 
+// Get values of a map in the same order that getKeys gets the keys of the map,
+// which is lexicographically sored by keys.
+func getValues(m map[string]string) []string {
+	values := make([]string, 0, len(m))
+	keys := getKeys(m)
+	for _, k := range keys {
+		values = append(values, m[k])
+	}
+	return values
+}
+
 func assertValueStartsWith(t *testing.T, m map[string]string, rx interface{}) {
 	for _, v := range m {
 		assert.Regexp(t, rx, v)
@@ -78,11 +89,14 @@ func TestExamplesComplete(t *testing.T) {
 	// Run `terraform output` to get the value of an output variable
 	publicNATGateWayIds := terraform.OutputMap(t, terraformOptions, "public_az_ngw_ids")
 	// Run `terraform output` to get the value of an output variable
+	publicOnlyNATGateWayIds := terraform.OutputMap(t, terraformOptions, "public_only_az_ngw_ids")
+	// Run `terraform output` to get the value of an output variable
 	publicRouteTableIds := terraform.OutputMap(t, terraformOptions, "public_az_route_table_ids")
 	// Run `terraform output` to get the value of an output variable
 	publicSubnetIds := terraform.OutputMap(t, terraformOptions, "public_az_subnet_ids")
 
 	expectedAZs := []string{"us-east-2a", "us-east-2b", "us-east-2c"}
+	expectedNulls := []string{"<nil>", "<nil>", "<nil>"}
 	// Verify we're getting back the outputs we expect
 	assert.Equal(t, expectedAZs, getKeys(privateSubnetIds))
 	assertValueStartsWith(t, privateSubnetIds, "^subnet-.*")
@@ -90,6 +104,8 @@ func TestExamplesComplete(t *testing.T) {
 	assertValueStartsWith(t, privateRouteTableIds, "^rtb-.*")
 	assert.Equal(t, expectedAZs, getKeys(publicNATGateWayIds))
 	assertValueStartsWith(t, publicNATGateWayIds, "^nat-.*")
+	assert.Equal(t, expectedAZs, getKeys(publicOnlyNATGateWayIds))
+	assert.Equal(t, expectedNulls, getValues(publicOnlyNATGateWayIds))
 	assert.Equal(t, expectedAZs, getKeys(publicRouteTableIds))
 	assertValueStartsWith(t, publicRouteTableIds, "^rtb-.*")
 	assert.Equal(t, expectedAZs, getKeys(publicSubnetIds))
