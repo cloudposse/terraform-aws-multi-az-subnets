@@ -90,10 +90,10 @@ resource "aws_route_table_association" "private" {
 }
 
 resource "aws_route" "default" {
-  for_each = local.private_azs
+  for_each = var.az_ngw_ids
 
   route_table_id         = aws_route_table.private[each.key].id
-  nat_gateway_id         = var.az_ngw_ids[each.key]
+  nat_gateway_id         = each.value
   destination_cidr_block = "0.0.0.0/0"
   depends_on             = [aws_route_table.private]
 }
