@@ -21,7 +21,14 @@ variable "vpc_id" {
 
 variable "cidr_block" {
   type        = string
+  default     = ""
   description = "Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`)"
+}
+
+variable "cidr_blocks" {
+  type        = list(string)
+  description = "Manually defined list of CIDRs; Its up to the user to make sure this list is the same size as AZs list"
+  default     = []
 }
 
 variable "igw_id" {

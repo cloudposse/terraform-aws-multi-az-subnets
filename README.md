@@ -246,7 +246,23 @@ for example:
 `lookup(private_az_subnet_ids, "us-east-2b")`
 <br/>
 
+*Example use of manually defined cidrs per subnet*
+```hcl
+module "private_subnets" {
+  source = "cloudposse/multi-az-subnets/aws"
+  # Cloud Posse recommends pinning every module to a specific version
+  # version = "x.x.x"
 
+  namespace           = var.namespace
+  stage               = var.stage
+  name                = var.name
+  availability_zones  = ["us-east-2a", "us-east-2b", "us-east-2c"]
+  vpc_id              = module.vpc.vpc_id
+  cidr_blocks         = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+  type                = "private"
+  az_ngw_ids          = module.public_subnets.az_ngw_ids
+}
+```
 
 <!-- markdownlint-disable -->
 ## Makefile Targets
