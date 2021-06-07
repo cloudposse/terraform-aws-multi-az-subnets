@@ -342,6 +342,7 @@ Available targets:
 | <a name="output_az_ngw_ids"></a> [az\_ngw\_ids](#output\_az\_ngw\_ids) | Map of AZ names to NAT Gateway IDs (only for public subnets) |
 | <a name="output_az_route_table_ids"></a> [az\_route\_table\_ids](#output\_az\_route\_table\_ids) | Map of AZ names to Route Table IDs |
 | <a name="output_az_subnet_arns"></a> [az\_subnet\_arns](#output\_az\_subnet\_arns) | Map of AZ names to subnet ARNs |
+| <a name="output_az_subnet_cidr_blocks"></a> [az\_subnet\_cidr\_blocks](#output\_az\_subnet\_cidr\_blocks) | Map of AZ names to subnet CIDR blocks |
 | <a name="output_az_subnet_ids"></a> [az\_subnet\_ids](#output\_az\_subnet\_ids) | Map of AZ names to subnet IDs |
 | <a name="output_az_subnet_map"></a> [az\_subnet\_map](#output\_az\_subnet\_map) | Map of AZ names to map of information about subnets |
 <!-- markdownlint-restore -->

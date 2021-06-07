@@ -9,7 +9,7 @@ output "az_subnet_arns" {
 }
 
 output "az_subnet_cidr_blocks" {
-  value = { for az, m in local.output_map: az => m.subnet_cidr_block }
+  value       = { for az, m in local.output_map : az => m.subnet_cidr_block }
   description = "Map of AZ names to subnet CIDR blocks"
 }
 
