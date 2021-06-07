@@ -342,6 +342,7 @@ Available targets:
 | <a name="output_az_ngw_ids"></a> [az\_ngw\_ids](#output\_az\_ngw\_ids) | Map of AZ names to NAT Gateway IDs (only for public subnets) |
 | <a name="output_az_route_table_ids"></a> [az\_route\_table\_ids](#output\_az\_route\_table\_ids) | Map of AZ names to Route Table IDs |
 | <a name="output_az_subnet_arns"></a> [az\_subnet\_arns](#output\_az\_subnet\_arns) | Map of AZ names to subnet ARNs |
+| <a name="output_az_subnet_cidr_blocks"></a> [az\_subnet\_cidr\_blocks](#output\_az\_subnet\_cidr\_blocks) | Map of AZ names to subnet CIDR blocks |
 | <a name="output_az_subnet_ids"></a> [az\_subnet\_ids](#output\_az\_subnet\_ids) | Map of AZ names to subnet IDs |
 | <a name="output_az_subnet_map"></a> [az\_subnet\_map](#output\_az\_subnet\_map) | Map of AZ names to map of information about subnets |
 <!-- markdownlint-restore -->
@@ -355,6 +356,7 @@ Like this project? Please give it a ★ on [our GitHub](https://github.com/cloud
 Are you using this project or any of our other projects? Consider [leaving a testimonial][testimonial]. =)
 
 
+
 ## Related Projects
 
 Check out these related projects.
@@ -363,8 +365,6 @@ Check out these related projects.
 - [terraform-aws-dynamic-subnets](https://github.com/cloudposse/terraform-aws-dynamic-subnets) - Terraform module for public and private subnets provisioning in existing VPC
 - [terraform-aws-vpc](https://github.com/cloudposse/terraform-aws-vpc) - Terraform Module that defines a VPC with public/private subnets across multiple AZs with Internet Gateways
 - [terraform-aws-cloudwatch-flow-logs](https://github.com/cloudposse/terraform-aws-cloudwatch-flow-logs) - Terraform module for enabling flow logs for vpc and subnets.
-
-
 
 ## Help
 
