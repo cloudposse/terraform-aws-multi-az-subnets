@@ -3,8 +3,10 @@ provider "aws" {
 }
 
 locals {
-  public_cidr_block  = cidrsubnet(var.cidr_block, 1, 0)
-  private_cidr_block = cidrsubnet(var.cidr_block, 1, 1)
+  public_cidr_block       = cidrsubnet(var.cidr_block, 2, 0)
+  public_only_cidr_block  = cidrsubnet(var.cidr_block, 2, 1)
+  private_cidr_block      = cidrsubnet(var.cidr_block, 2, 2)
+  private_only_cidr_block = cidrsubnet(var.cidr_block, 2, 3)
 }
 
 module "vpc" {
@@ -19,7 +21,6 @@ module "vpc" {
 module "public_subnets" {
   source = "../../"
 
-  enabled             = var.enabled
   availability_zones  = var.availability_zones
   vpc_id              = module.vpc.vpc_id
   cidr_block          = local.public_cidr_block
@@ -30,10 +31,22 @@ module "public_subnets" {
   context = module.this.context
 }
 
+module "public_only_subnets" {
+  source = "../../"
+
+  availability_zones  = var.availability_zones
+  vpc_id              = module.vpc.vpc_id
+  cidr_block          = local.public_only_cidr_block
+  type                = "public"
+  igw_id              = module.vpc.igw_id
+  nat_gateway_enabled = false
+
+  context = module.this.context
+}
+
 module "private_subnets" {
   source = "../../"
 
-  enabled            = var.enabled
   availability_zones = var.availability_zones
   vpc_id             = module.vpc.vpc_id
   cidr_block         = local.private_cidr_block
@@ -41,6 +54,20 @@ module "private_subnets" {
 
   # Map of AZ names to NAT Gateway IDs that was created in "public_subnets" module
   az_ngw_ids = module.public_subnets.az_ngw_ids
+
+  context = module.this.context
+}
+
+module "private_only_subnets" {
+  source = "../../"
+
+  availability_zones = var.availability_zones
+  vpc_id             = module.vpc.vpc_id
+  cidr_block         = local.private_only_cidr_block
+  type               = "private"
+
+  # No NAT gateways supplied, should create subnets with empty route tables
+  # az_ngw_ids = module.public_subnets.az_ngw_ids
 
   context = module.this.context
 }

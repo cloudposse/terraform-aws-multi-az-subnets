@@ -16,6 +16,17 @@ func getKeys(m map[string]string) []string {
 	return keys
 }
 
+// Get values of a map in the same order that getKeys gets the keys of the map,
+// which is lexicographically sored by keys.
+func getValues(m map[string]string) []string {
+	values := make([]string, 0, len(m))
+	keys := getKeys(m)
+	for _, k := range keys {
+		values = append(values, m[k])
+	}
+	return values
+}
+
 func assertValueStartsWith(t *testing.T, m map[string]string, rx interface{}) {
 	for _, v := range m {
 		assert.Regexp(t, rx, v)
@@ -54,6 +65,11 @@ func TestExamplesComplete(t *testing.T) {
 	     "us-east-2b" = "subnet-05861d30d45e7b675"
 	     "us-east-2c" = "subnet-036d747a2b46857ae"
 	   }
+	   private_az_subnet_cidr_blocks = {
+	     "us-east-2a" = "172.16.128.0/21"
+	     "us-east-2b" = "172.16.136.0/21"
+	     "us-east-2c" = "172.16.144.0/21"
+	   }
 	   public_az_ngw_ids = {
 	     "us-east-2a" = "nat-0f5057f09b8cd8ddc"
 	     "us-east-2b" = "nat-0971b2505ea6d03f1"
@@ -69,6 +85,11 @@ func TestExamplesComplete(t *testing.T) {
 	     "us-east-2b" = "subnet-0b432a6748ca40638"
 	     "us-east-2c" = "subnet-00a9a6636ca722474"
 	   }
+	   public_az_subnet_cidr_blocks = {
+	     "us-east-2a" = "172.16.0.0/21"
+	     "us-east-2b" = "172.16.8.0/21"
+	     "us-east-2c" = "172.16.16.0/21"
+	   }
 	*/
 
 	// Run `terraform output` to get the value of an output variable
@@ -78,11 +99,14 @@ func TestExamplesComplete(t *testing.T) {
 	// Run `terraform output` to get the value of an output variable
 	publicNATGateWayIds := terraform.OutputMap(t, terraformOptions, "public_az_ngw_ids")
 	// Run `terraform output` to get the value of an output variable
+	publicOnlyNATGateWayIds := terraform.OutputMap(t, terraformOptions, "public_only_az_ngw_ids")
+	// Run `terraform output` to get the value of an output variable
 	publicRouteTableIds := terraform.OutputMap(t, terraformOptions, "public_az_route_table_ids")
 	// Run `terraform output` to get the value of an output variable
 	publicSubnetIds := terraform.OutputMap(t, terraformOptions, "public_az_subnet_ids")
 
 	expectedAZs := []string{"us-east-2a", "us-east-2b", "us-east-2c"}
+	expectedNulls := []string{"<nil>", "<nil>", "<nil>"}
 	// Verify we're getting back the outputs we expect
 	assert.Equal(t, expectedAZs, getKeys(privateSubnetIds))
 	assertValueStartsWith(t, privateSubnetIds, "^subnet-.*")
@@ -90,10 +114,23 @@ func TestExamplesComplete(t *testing.T) {
 	assertValueStartsWith(t, privateRouteTableIds, "^rtb-.*")
 	assert.Equal(t, expectedAZs, getKeys(publicNATGateWayIds))
 	assertValueStartsWith(t, publicNATGateWayIds, "^nat-.*")
+	assert.Equal(t, expectedAZs, getKeys(publicOnlyNATGateWayIds))
+	assert.Equal(t, expectedNulls, getValues(publicOnlyNATGateWayIds))
 	assert.Equal(t, expectedAZs, getKeys(publicRouteTableIds))
 	assertValueStartsWith(t, publicRouteTableIds, "^rtb-.*")
 	assert.Equal(t, expectedAZs, getKeys(publicSubnetIds))
 	assertValueStartsWith(t, publicSubnetIds, "^subnet-.*")
+
+	expectedPublicCidrBlocks := []string{"172.16.0.0/21", "172.16.8.0/21", "172.16.16.0/21"}
+	expectedPrivateCidrBlocks := []string{"172.16.128.0/21", "172.16.136.0/21", "172.16.144.0/21"}
+	// Run `terraform output` to get the value of an output variable
+	publicSubnetCidrBlocks := terraform.OutputMap(t, terraformOptions, "public_az_subnet_cidr_blocks")
+	privateSubnetCidrBlocks := terraform.OutputMap(t, terraformOptions, "private_az_subnet_cidr_blocks")
+	// Verify output
+	assert.Equal(t, expectedAZs, getKeys(publicSubnetCidrBlocks))
+	assert.Equal(t, expectedPublicCidrBlocks, getValues(publicSubnetCidrBlocks))
+	assert.Equal(t, expectedAZs, getKeys(privateSubnetCidrBlocks))
+	assert.Equal(t, expectedPrivateCidrBlocks, getValues(privateSubnetCidrBlocks))
 }
 
 func TestExamplesCompleteDisabledModule(t *testing.T) {
@@ -105,7 +142,11 @@ func TestExamplesCompleteDisabledModule(t *testing.T) {
 		TerraformDir: "../../examples/complete",
 		Upgrade:      true,
 		// Variables to pass to our Terraform code using -var-file options
-		VarFiles: []string{"fixtures.us-east-2.tfvars", "fixtures.disabled.tfvars"},
+		VarFiles: []string{"fixtures.us-east-2.tfvars"},
+		Vars: map[string]interface{}{
+			"enabled": "false",
+		},
+
 	}
 
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created

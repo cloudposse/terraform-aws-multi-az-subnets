@@ -32,7 +32,11 @@ variable "igw_id" {
 
 variable "az_ngw_ids" {
   type        = map(string)
-  description = "Only for private subnets. Map of AZ names to NAT Gateway IDs that are used as default routes when creating private subnets"
+  description = <<-EOT
+    Only for private subnets. Map of AZ names to NAT Gateway IDs that are used as default routes when creating private subnets.
+    You should either supply one NAT Gateway ID for each AZ in `var.availability_zones` or leave the map empty.
+    If empty, no default egress route will be created and you will have to create your own using `aws_route`.
+    EOT
   default     = {}
 }
 
