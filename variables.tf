@@ -135,5 +135,6 @@ variable "ipv6_cidr_block" {
 
 variable "assign_public_ip_on_launch" {
   description = "Flag to enable/disable whether instances launched into public subnets should be assigned a public IP address"
-  default     = "false"
+  type        = bool
+  default     = false
 }
