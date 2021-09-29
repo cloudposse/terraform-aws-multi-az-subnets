@@ -27,6 +27,8 @@ module "public_subnets" {
   type                = "public"
   igw_id              = module.vpc.igw_id
   nat_gateway_enabled = true
+  ipv6_enabled        = true
+  ipv6_cidr_block     = var.ipv6_cidr_block
 
   context = module.this.context
 }
@@ -40,6 +42,8 @@ module "public_only_subnets" {
   type                = "public"
   igw_id              = module.vpc.igw_id
   nat_gateway_enabled = false
+  ipv6_enabled        = true
+  ipv6_cidr_block     = module.vpc.ipv6_cidr_block
 
   context = module.this.context
 }

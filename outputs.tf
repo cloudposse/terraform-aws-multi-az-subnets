@@ -13,6 +13,11 @@ output "az_subnet_cidr_blocks" {
   description = "Map of AZ names to subnet CIDR blocks"
 }
 
+output "az_subnet_ipv6_cidr_blocks" {
+  value       = { for az, m in local.output_map : az => m.subnet_ipv6_cidr_block }
+  description = "Map of AZ names to subnet IPv6 CIDR blocks"
+}
+
 output "az_route_table_ids" {
   value       = { for az, m in local.output_map : az => m.route_table_id }
   description = " Map of AZ names to Route Table IDs"
