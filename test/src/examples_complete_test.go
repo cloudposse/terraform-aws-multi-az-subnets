@@ -1,10 +1,13 @@
 package test
 
 import (
+	"github.com/gruntwork-io/terratest/modules/logger"
 	"github.com/gruntwork-io/terratest/modules/terraform"
+	"github.com/gruntwork-io/terratest/modules/testing"
 	"github.com/stretchr/testify/assert"
+	"path/filepath"
 	"sort"
-	"testing"
+	gotesting "testing"
 )
 
 func getKeys(m map[string]string) []string {
@@ -27,14 +30,25 @@ func getValues(m map[string]string) []string {
 	return values
 }
 
-func assertValueStartsWith(t *testing.T, m map[string]string, rx interface{}) {
+func assertValueStartsWith(t *gotesting.T, m map[string]string, rx interface{}) {
 	for _, v := range m {
 		assert.Regexp(t, rx, v)
 	}
 }
 
+func assertTagFromResource(t *gotesting.T, plan *terraform.PlanStruct, address string, key string, value string) {
+	terraform.RequirePlannedValuesMapKeyExists(t, plan, address)
+	awsSubnet := plan.ResourcePlannedValuesMap[address]
+	awsTagValue := awsSubnet.AttributeValues["tags"].(map[string]interface{})[key]
+	assert.Equal(t, value, awsTagValue)
+}
+
+type discardLogger struct{}
+
+func (_ discardLogger) Logf(_ testing.TestingT, format string, args ...interface{}) {}
+
 // Test the Terraform module in examples/complete using Terratest.
-func TestExamplesComplete(t *testing.T) {
+func TestExamplesComplete(t *gotesting.T) {
 	// Init phase module download fails when run in parallel
 	//t.Parallel()
 
@@ -45,12 +59,36 @@ func TestExamplesComplete(t *testing.T) {
 		// Variables to pass to our Terraform code using -var-file options
 		VarFiles: []string{"fixtures.us-east-2.tfvars"},
 	}
+	planLogger := logger.New(discardLogger{})
+	terraformPlanOptions := &terraform.Options{
+		TerraformDir: "../../examples/complete",
+		Upgrade:      true,
+		VarFiles:     []string{"fixtures.us-east-2.tfvars"},
+		// Comment out this logger to get the json output
+		Logger:       planLogger,
+		PlanFilePath: filepath.Join("plan.out"),
+	}
 
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created
 	defer terraform.Destroy(t, terraformOptions)
 
-	// This will run `terraform init` and `terraform apply` and fail the test if there are any errors
-	terraform.InitAndApply(t, terraformOptions)
+	// This will run `terraform init`, `terraform plan`, and `terraform show` returning a struct
+	plan := terraform.InitAndPlanAndShowWithStruct(t, terraformPlanOptions)
+
+	// Validate the plan data
+	var address string
+	address = "module.private_only_subnets.aws_subnet.private[\"us-east-2a\"]"
+	assertTagFromResource(t, plan, address, "Name", "eg-test-multi-az-subnets-private-ue2a")
+	address = "module.private_subnets.aws_subnet.private[\"us-east-2a\"]"
+	assertTagFromResource(t, plan, address, "Name", "eg-test-multi-az-subnets-private-use2a")
+	address = "module.public_only_subnets.aws_subnet.public[\"us-east-2a\"]"
+	assertTagFromResource(t, plan, address, "Name", "eg-test-multi-az-subnets-public-us-east-2a")
+	address = "module.public_subnets.aws_subnet.public[\"us-east-2a\"]"
+	assertTagFromResource(t, plan, address, "Name", "eg-test-multi-az-subnets-public-us-east-2a")
+
+	// This will run `terraform apply` and fail the test if there are any errors.
+	// If no errors it runs `terraform plan` and fail the test if there are additional changes.
+	terraform.ApplyAndIdempotent(t, terraformOptions)
 
 	/*
 	   Outputs:
@@ -128,7 +166,7 @@ func TestExamplesComplete(t *testing.T) {
 	assert.Equal(t, expectedPrivateCidrBlocks, getValues(privateSubnetCidrBlocks))
 }
 
-func TestExamplesCompleteDisabledModule(t *testing.T) {
+func TestExamplesCompleteDisabledModule(t *gotesting.T) {
 	// Init phase module download fails when run in parallel
 	//t.Parallel()
 

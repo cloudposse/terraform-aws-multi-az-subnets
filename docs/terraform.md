@@ -21,6 +21,7 @@
 | <a name="module_private_label"></a> [private\_label](#module\_private\_label) | cloudposse/label/null | 0.24.1 |
 | <a name="module_public_label"></a> [public\_label](#module\_public\_label) | cloudposse/label/null | 0.24.1 |
 | <a name="module_this"></a> [this](#module\_this) | cloudposse/label/null | 0.25.0 |
+| <a name="module_utils"></a> [utils](#module\_utils) | cloudposse/utils/aws | 0.8.0 |
 
 ## Resources
 
@@ -46,6 +47,7 @@
 |------|-------------|------|---------|:--------:|
 | <a name="input_additional_tag_map"></a> [additional\_tag\_map](#input\_additional\_tag\_map) | Additional key-value pairs to add to each map in `tags_as_list_of_maps`. Not added to `tags` or `id`.<br>This is for some rare cases where resources want additional configuration of tags<br>and therefore take a list of maps with tag key, value, and additional configuration. | `map(string)` | `{}` | no |
 | <a name="input_attributes"></a> [attributes](#input\_attributes) | ID element. Additional attributes (e.g. `workers` or `cluster`) to add to `id`,<br>in the order they appear in the list. New attributes are appended to the<br>end of the list. The elements of the list are joined by the `delimiter`<br>and treated as a single ID element. | `list(string)` | `[]` | no |
+| <a name="input_availability_zone_attribute_style"></a> [availability\_zone\_attribute\_style](#input\_availability\_zone\_attribute\_style) | The style of Availability Zone code to use in tags and names. One of `full`, `short`, or `fixed`. | `string` | `"full"` | no |
 | <a name="input_availability_zones"></a> [availability\_zones](#input\_availability\_zones) | List of Availability Zones (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`) | `list(string)` | n/a | yes |
 | <a name="input_az_ngw_ids"></a> [az\_ngw\_ids](#input\_az\_ngw\_ids) | Only for private subnets. Map of AZ names to NAT Gateway IDs that are used as default routes when creating private subnets.<br>You should either supply one NAT Gateway ID for each AZ in `var.availability_zones` or leave the map empty.<br>If empty, no default egress route will be created and you will have to create your own using `aws_route`. | `map(string)` | `{}` | no |
 | <a name="input_cidr_block"></a> [cidr\_block](#input\_cidr\_block) | Base CIDR block which is divided into subnet CIDR blocks (e.g. `10.0.0.0/16`) | `string` | n/a | yes |

@@ -50,6 +50,8 @@ module "public_only_subnets" {
   ipv6_enabled        = var.ipv6_enabled
   ipv6_cidr_block     = local.public_only_ipv6_cidr_block
 
+  availability_zone_attribute_style = "full"
+
   context = module.this.context
 }
 
@@ -61,6 +63,8 @@ module "private_subnets" {
   cidr_block         = local.private_cidr_block
   type               = "private"
   ipv6_enabled       = var.ipv6_enabled
+
+  availability_zone_attribute_style = "short"
 
   # Map of AZ names to NAT Gateway IDs that was created in "public_subnets" module
   az_ngw_ids = module.public_subnets.az_ngw_ids
@@ -76,6 +80,8 @@ module "private_only_subnets" {
   cidr_block         = local.private_only_cidr_block
   type               = "private"
   ipv6_enabled       = false
+
+  availability_zone_attribute_style = "fixed"
 
   # No NAT gateways supplied, should create subnets with empty route tables
   # az_ngw_ids = module.public_subnets.az_ngw_ids

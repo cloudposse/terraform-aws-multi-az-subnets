@@ -15,4 +15,16 @@ locals {
     subnet_ipv6_cidr_block = local.public_ipv6_enabled ? aws_subnet.public[az].ipv6_cidr_block : null
     }
   }
+
+  map_map = {
+    short = "to_short"
+    fixed = "to_fixed"
+    full  = "identity"
+  }
+  az_map = module.utils.region_az_alt_code_maps[local.map_map[var.availability_zone_attribute_style]]
+}
+
+module "utils" {
+  source  = "cloudposse/utils/aws"
+  version = "0.8.0"
 }

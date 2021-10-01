@@ -28,7 +28,7 @@ resource "aws_subnet" "public" {
   tags = merge(
     module.public_label.tags,
     {
-      "Name" = "${module.public_label.id}${module.this.delimiter}${each.key}"
+      "Name" = "${module.public_label.id}${module.this.delimiter}${local.az_map[each.key]}"
       "Type" = var.type
     },
   )
@@ -79,7 +79,7 @@ resource "aws_route_table" "public" {
   tags = merge(
     module.public_label.tags,
     {
-      "Name" = "${module.public_label.id}${module.this.delimiter}${each.key}"
+      "Name" = "${module.public_label.id}${module.this.delimiter}${local.az_map[each.key]}"
       "Type" = var.type
     },
   )
@@ -138,7 +138,7 @@ resource "aws_nat_gateway" "public" {
   tags = merge(
     module.public_label.tags,
     {
-      "Name" = "${module.public_label.id}${module.this.delimiter}${each.key}"
+      "Name" = "${module.public_label.id}${module.this.delimiter}${local.az_map[each.key]}"
       "Type" = var.type
     },
   )

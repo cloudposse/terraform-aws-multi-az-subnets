@@ -21,7 +21,7 @@ resource "aws_subnet" "private" {
   tags = merge(
     module.private_label.tags,
     {
-      "Name" = "${module.private_label.id}${module.this.delimiter}${each.key}"
+      "Name" = "${module.private_label.id}${module.this.delimiter}${local.az_map[each.key]}"
       "Type" = var.type
     },
   )
@@ -72,7 +72,7 @@ resource "aws_route_table" "private" {
   tags = merge(
     module.private_label.tags,
     {
-      "Name" = "${module.private_label.id}${module.this.delimiter}${each.key}"
+      "Name" = "${module.private_label.id}${module.this.delimiter}${local.az_map[each.key]}"
       "Type" = var.type
     },
   )

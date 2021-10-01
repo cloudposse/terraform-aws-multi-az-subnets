@@ -121,6 +121,7 @@ variable "nat_gateway_enabled" {
   default     = "true"
 }
 
+
 variable "ipv6_enabled" {
   description = "Flag to enable/disable IPv6 creation in public subnets"
   type        = bool
@@ -131,4 +132,10 @@ variable "ipv6_cidr_block" {
   type        = string
   description = "Base IPv6 CIDR block which is divided into /64 subnet CIDR blocks"
   default     = null
+}
+
+variable "availability_zone_attribute_style" {
+  type        = string
+  default     = "full"
+  description = "The style of Availability Zone code to use in tags and names. One of `full`, `short`, or `fixed`."
 }
