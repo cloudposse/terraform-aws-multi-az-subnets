@@ -126,11 +126,6 @@ func TestExamplesComplete(t *testing.T) {
 	assert.Equal(t, expectedPublicCidrBlocks, getValues(publicSubnetCidrBlocks))
 	assert.Equal(t, expectedAZs, getKeys(privateSubnetCidrBlocks))
 	assert.Equal(t, expectedPrivateCidrBlocks, getValues(privateSubnetCidrBlocks))
-
-    // Validate IPv6 CIDR blocks work as expected.
-	publicSubnetIpv6CidrBlocks := terraform.OutputMap(t, terraformOptions, "public_az_subnet_ipv6_cidr_blocks")
-	expectedPublicIpv6CidrBlocks := []string{"fd00::/64","fd00:0:0:1::/64","fd00:0:0:2::/64"}
-	asset.Equal(t, expectedPublicIpv6CidrBlocks, getKeys(publicSubnetIpv6CidrBlocks))
 }
 
 func TestExamplesCompleteDisabledModule(t *testing.T) {

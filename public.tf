@@ -6,10 +6,6 @@ locals {
   public_ipv6_target_mask = 64
 }
 
-data "aws_vpc" "parent" {
-  id = var.vpc_id
-}
-
 module "public_label" {
   source  = "cloudposse/label/null"
   version = "0.24.1"
@@ -104,7 +100,7 @@ resource "aws_route" "public_ipv6" {
   route_table_id              = aws_route_table.public[each.key].id
   gateway_id                  = var.igw_id
   destination_ipv6_cidr_block = "::/0"
-  depends_on                  = [data.aws_vpc.parent, aws_route_table.public]
+  depends_on                  = [aws_route_table.public]
 }
 
 resource "aws_route_table_association" "public" {

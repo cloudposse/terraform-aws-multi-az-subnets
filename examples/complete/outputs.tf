@@ -43,5 +43,5 @@ output "public_az_subnet_cidr_blocks" {
 }
 
 output "public_az_subnet_ipv6_cidr_blocks" {
-  value = module.public_subnets.az_subnet_cidr_blocks
+  value = module.public_subnets.az_subnet_ipv6_cidr_blocks
 }
