@@ -15,5 +15,5 @@ variable "availability_zones" {
 
 variable "ipv6_cidr_block" {
   type        = string
-  description = "Private IPv6 CIDR block used to test cidrsubnet math."
+  description = "Private IPv6 CIDR block"
 }
