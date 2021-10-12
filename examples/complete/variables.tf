@@ -16,5 +16,4 @@ variable "availability_zones" {
 variable "ipv6_enabled" {
   description = "Flag to enable/disable IPv6 creation in public subnets"
   type        = bool
-  default     = false
 }
