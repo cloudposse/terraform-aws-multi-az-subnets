@@ -102,7 +102,7 @@ resource "aws_route_table_association" "public" {
 resource "aws_eip" "public" {
   for_each = local.public_nat_gateway_azs
   vpc      = true
-  tags       = module.public_label.tags
+  tags     = module.public_label.tags
 
   lifecycle {
     create_before_destroy = true
