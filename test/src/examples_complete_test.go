@@ -94,15 +94,10 @@ func TestExamplesComplete(t *testing.T) {
 
 	// Run `terraform output` to get the value of an output variable
 	privateSubnetIds := terraform.OutputMap(t, terraformOptions, "private_az_subnet_ids")
-	// Run `terraform output` to get the value of an output variable
 	privateRouteTableIds := terraform.OutputMap(t, terraformOptions, "private_az_route_table_ids")
-	// Run `terraform output` to get the value of an output variable
 	publicNATGateWayIds := terraform.OutputMap(t, terraformOptions, "public_az_ngw_ids")
-	// Run `terraform output` to get the value of an output variable
 	publicOnlyNATGateWayIds := terraform.OutputMap(t, terraformOptions, "public_only_az_ngw_ids")
-	// Run `terraform output` to get the value of an output variable
 	publicRouteTableIds := terraform.OutputMap(t, terraformOptions, "public_az_route_table_ids")
-	// Run `terraform output` to get the value of an output variable
 	publicSubnetIds := terraform.OutputMap(t, terraformOptions, "public_az_subnet_ids")
 
 	expectedAZs := []string{"us-east-2a", "us-east-2b", "us-east-2c"}
@@ -146,7 +141,6 @@ func TestExamplesCompleteDisabledModule(t *testing.T) {
 		Vars: map[string]interface{}{
 			"enabled": "false",
 		},
-
 	}
 
 	// At the end of the test, run `terraform destroy` to clean up any resources that were created
@@ -161,6 +155,7 @@ func TestExamplesCompleteDisabledModule(t *testing.T) {
 	publicNATGateWayIds := terraform.OutputMap(t, terraformOptions, "public_az_ngw_ids")
 	publicRouteTableIds := terraform.OutputMap(t, terraformOptions, "public_az_route_table_ids")
 	publicSubnetIds := terraform.OutputMap(t, terraformOptions, "public_az_subnet_ids")
+	publicSubnetIpv6CidrBlocks := terraform.OutputMap(t, terraformOptions, "public_az_subnet_ipv6_cidr_blocks")
 
 	assert.Empty(t, privateNATGateWayIds)
 	assert.Empty(t, privateSubnetIds)
@@ -168,4 +163,5 @@ func TestExamplesCompleteDisabledModule(t *testing.T) {
 	assert.Empty(t, publicNATGateWayIds)
 	assert.Empty(t, publicSubnetIds)
 	assert.Empty(t, publicRouteTableIds)
+	assert.Empty(t, publicSubnetIpv6CidrBlocks)
 }

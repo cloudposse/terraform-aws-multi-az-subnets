@@ -11,6 +11,8 @@ locals {
     subnet_cidr_block = local.public_enabled ? aws_subnet.public[az].cidr_block : aws_subnet.private[az].cidr_block
     route_table_id    = local.public_enabled ? aws_route_table.public[az].id : aws_route_table.private[az].id
     ngw_id            = local.public_enabled && var.nat_gateway_enabled ? aws_nat_gateway.public[az].id : null
+
+    subnet_ipv6_cidr_block = local.public_ipv6_enabled ? aws_subnet.public[az].ipv6_cidr_block : null
     }
   }
 }

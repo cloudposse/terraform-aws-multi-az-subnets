@@ -1,6 +1,9 @@
 locals {
-  public_azs             = local.public_enabled ? { for idx, az in var.availability_zones : az => idx } : {}
-  public_nat_gateway_azs = local.public_enabled && var.nat_gateway_enabled ? local.public_azs : {}
+  public_azs              = local.public_enabled ? { for idx, az in var.availability_zones : az => idx } : {}
+  public_nat_gateway_azs  = local.public_enabled && var.nat_gateway_enabled ? local.public_azs : {}
+  public_ipv6_enabled     = local.public_enabled && var.ipv6_enabled
+  public_ipv6_azs         = local.public_ipv6_enabled ? local.public_azs : {}
+  public_ipv6_target_mask = 64
 }
 
 module "public_label" {
@@ -18,6 +21,9 @@ resource "aws_subnet" "public" {
   vpc_id            = var.vpc_id
   availability_zone = each.key
   cidr_block        = cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), each.value)
+  ipv6_cidr_block = local.public_ipv6_enabled ? cidrsubnet(var.ipv6_cidr_block, (
+    local.public_ipv6_target_mask - tonumber(split("/", var.ipv6_cidr_block)[1])
+  ), each.value) : null
 
   tags = merge(
     module.public_label.tags,
@@ -86,6 +92,15 @@ resource "aws_route" "public" {
   gateway_id             = var.igw_id
   destination_cidr_block = "0.0.0.0/0"
   depends_on             = [aws_route_table.public]
+}
+
+resource "aws_route" "public_ipv6" {
+  for_each = local.public_ipv6_azs
+
+  route_table_id              = aws_route_table.public[each.key].id
+  gateway_id                  = var.igw_id
+  destination_ipv6_cidr_block = "::/0"
+  depends_on                  = [aws_route_table.public]
 }
 
 resource "aws_route_table_association" "public" {

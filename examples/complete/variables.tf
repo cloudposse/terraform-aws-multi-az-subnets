@@ -12,3 +12,8 @@ variable "availability_zones" {
   type        = list(string)
   description = "List of Availability Zones (e.g. `['us-east-1a', 'us-east-1b', 'us-east-1c']`)"
 }
+
+variable "ipv6_enabled" {
+  description = "Flag to enable/disable IPv6 creation in public subnets"
+  type        = bool
+}
