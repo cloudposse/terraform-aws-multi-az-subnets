@@ -17,6 +17,7 @@ resource "aws_subnet" "private" {
   vpc_id            = var.vpc_id
   availability_zone = each.key
   cidr_block        = cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), each.value)
+  outpost_arn       = var.outpost_arn
 
   tags = merge(
     module.private_label.tags,

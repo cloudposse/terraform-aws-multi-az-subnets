@@ -132,3 +132,9 @@ variable "ipv6_cidr_block" {
   description = "Base IPv6 CIDR block which is divided into /64 subnet CIDR blocks"
   default     = null
 }
+
+variable "outpost_arn" {
+  type        = string
+  description = "Outpost ARN to create the subnet"
+  default     = null
+}
