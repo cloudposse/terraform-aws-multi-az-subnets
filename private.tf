@@ -93,7 +93,8 @@ resource "aws_route" "default" {
   for_each = var.az_ngw_ids
 
   route_table_id         = aws_route_table.private[each.key].id
-  nat_gateway_id         = each.value
+  nat_gateway_id         = var.is_nat ? each.value : null
+  network_interface_id   = var.is_nat ? null : each.value
   destination_cidr_block = "0.0.0.0/0"
   depends_on             = [aws_route_table.private]
 }

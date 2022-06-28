@@ -132,3 +132,6 @@ variable "ipv6_cidr_block" {
   description = "Base IPv6 CIDR block which is divided into /64 subnet CIDR blocks"
   default     = null
 }
+
+variable "is_nat" {
+}
