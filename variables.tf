@@ -135,3 +135,7 @@ variable "ipv6_cidr_block" {
 
 variable "is_nat" {
 }
+
+variable "subnet_cidr_block_list" {
+  default = []
+}

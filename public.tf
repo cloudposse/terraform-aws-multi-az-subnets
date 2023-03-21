@@ -20,7 +20,9 @@ resource "aws_subnet" "public" {
 
   vpc_id            = var.vpc_id
   availability_zone = each.key
-  cidr_block        = cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), each.value)
+  cidr_block        = (length(var.subnet_cidr_block_list) == 0 ? 
+                      cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), each.value) : 
+                      var.subnet_cidr_block_list[each.value])
   ipv6_cidr_block = local.public_ipv6_enabled ? cidrsubnet(var.ipv6_cidr_block, (
     local.public_ipv6_target_mask - tonumber(split("/", var.ipv6_cidr_block)[1])
   ), each.value) : null
