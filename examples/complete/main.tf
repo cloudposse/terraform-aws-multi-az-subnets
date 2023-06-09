@@ -14,13 +14,11 @@ locals {
 
 module "vpc" {
   source  = "cloudposse/vpc/aws"
-  version = "0.27.0"
+  version = "2.1.0"
 
-  cidr_block                       = var.cidr_block
-  assign_generated_ipv6_cidr_block = true
+  ipv4_primary_cidr_block = var.vpc_cidr_block
 
   context = module.this.context
-
 }
 
 module "public_subnets" {
