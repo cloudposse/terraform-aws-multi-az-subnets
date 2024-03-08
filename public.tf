@@ -8,7 +8,7 @@ locals {
 
 module "public_label" {
   source  = "cloudposse/label/null"
-  version = "0.24.1"
+  version = "0.25.0"
 
   attributes = ["public"]
 
