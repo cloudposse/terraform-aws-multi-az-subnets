@@ -1,0 +1,7 @@
+# Upstream changes from _extends are only recognized when modifications are made to this file in the default branch.
+_extends: .github
+repository:
+  name: terraform-aws-multi-az-subnets
+  description: 'DEPRECATED (use cloudposse/terraform-aws-dynamic-subnets instead): Terraform module for multi-AZ public and private subnets provisioning'
+  homepage: https://cloudposse.com/accelerate
+  topics: terraform, subnet, private-subnets, multi-az, nat-gateways, subnet-ids, terraform-module, cidr, dynamic, subnet-calculator, hcl2
