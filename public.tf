@@ -116,7 +116,7 @@ resource "aws_route_table_association" "public" {
 
 resource "aws_eip" "public" {
   for_each = local.public_nat_gateway_azs
-  vpc      = true
+  domain   = "vpc"
   tags     = module.public_label.tags
 
   lifecycle {
