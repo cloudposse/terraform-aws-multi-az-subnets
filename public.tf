@@ -18,12 +18,10 @@ module "public_label" {
 resource "aws_subnet" "public" {
   for_each = local.public_azs
 
-  vpc_id            = var.vpc_id
-  availability_zone = each.key
-  cidr_block        = cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), each.value)
-  ipv6_cidr_block = local.public_ipv6_enabled ? cidrsubnet(var.ipv6_cidr_block, (
-    local.public_ipv6_target_mask - tonumber(split("/", var.ipv6_cidr_block)[1])
-  ), each.value) : null
+  vpc_id                  = var.vpc_id
+  availability_zone       = each.key
+  cidr_block              = cidrsubnet(var.cidr_block, ceil(log(var.max_subnets, 2)), each.value)
+  map_public_ip_on_launch = var.assign_public_ip_on_launch
 
   tags = merge(
     module.public_label.tags,
