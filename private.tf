@@ -22,7 +22,7 @@ resource "aws_subnet" "private" {
 
   tags = merge(
     contains(keys(var.subnets_exclude_tags), "${module.private_label.id}${module.this.delimiter}${each.key}") ? 
-      { for k, v in module.private_label.tags: k => v if !contains(values(var.subnets_exclude_tags), v) } : module.private_label.tags,
+      { for k, v in module.private_label.tags: k => v if !contains(var.subnets_exclude_tags["${module.private_label.id}${module.this.delimiter}${each.key}"], v) } : module.private_label.tags,
     {
       "Name" = "${module.private_label.id}${module.this.delimiter}${each.key}"
       "Type" = var.type
