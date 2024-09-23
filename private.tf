@@ -21,7 +21,8 @@ resource "aws_subnet" "private" {
                       var.subnet_cidr_block_list[each.value])
 
   tags = merge(
-    { for k, v in module.private_label.tags: k => v if !contains(var.private_subnets_exclude_tags, v) },
+    contains(keys(var.subnets_exclude_tags), "${module.private_label.id}${module.this.delimiter}${each.key}") ? 
+      { for k, v in module.private_label.tags: k => v if !contains(values(var.subnets_exclude_tags), v) } : module.private_label.tags,
     {
       "Name" = "${module.private_label.id}${module.this.delimiter}${each.key}"
       "Type" = var.type
